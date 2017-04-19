@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_item_show_leader_board"
+        android:icon="@drawable/ic_star"
+        android:title="@string/show_leader_board"
+        app:showAsAction="ifRoom|withText"/>
+    <item
+        android:id="@+id/menu_item_show_schedule"
+        android:icon="@drawable/ic_schedule"
+        android:title="@string/show_schedule"
+        app:showAsAction="ifRoom|withText"/>
+</menu>

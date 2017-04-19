@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Attendroid</string>
+    <string name="show_schedule">Show Schedule</string>
+    <string name="show_leader_board">Show Leader Board</string>
 </resources>

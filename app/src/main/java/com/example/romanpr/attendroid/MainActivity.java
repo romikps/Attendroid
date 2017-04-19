@@ -4,6 +4,8 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -47,6 +49,14 @@ public class MainActivity extends AppCompatActivity {
         createAccount("testy@thk.edu.tr", "qwerty123");
         signIn("testy@thk.edu.tr", "qwerty123");
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.student_main, menu);
+        return true;
     }
 
     // Attach the listener to your FirebaseAuth instance in the onStart() method and remove it on onStop().
