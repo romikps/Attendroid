@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -22,13 +23,18 @@ import com.google.firebase.database.ValueEventListener;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+
+    DatabaseReference database;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         // Setting up authentication
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -38,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in: " + user.getUid());
+                    database = FirebaseDatabase.getInstance().getReference(user.getUid());
+                    playAround();
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
@@ -45,9 +53,14 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        // playAround();
-        createAccount("testy@thk.edu.tr", "qwerty123");
+        // createAccount("testy@thk.edu.tr", "qwerty123");
         signIn("testy@thk.edu.tr", "qwerty123");
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
 
     }
 
@@ -103,13 +116,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     protected void playAround() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("messages");
 
-        //myRef.setValue("Hello, World!");
-        myRef.push().setValue("Hello, world!");
+        FirebaseUser user = mAuth.getCurrentUser();
+        /* Student stu = new Student("Roman", "Priscepov", "roman.priscepov@hotmail.com",
+                user.getUid(), "130144607"); */
+        /* Course course = new Course("Mobile Architectures", user.getUid());
+        course.addCourseHours(DayOfWeek.Monday, "9:40", "11:20");
+        course.addCourseHours(DayOfWeek.Thursday, "13:40", "15:20"); */
+        // database.push().setValue(course);
 
-        myRef.addValueEventListener(new ValueEventListener() {
+        database.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
@@ -125,5 +141,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.w(TAG, "Failed to read value.", databaseError.toException());
             }
         });
+    }
+
+    public void setRole(String userId, Role role) {
+
     }
 }
