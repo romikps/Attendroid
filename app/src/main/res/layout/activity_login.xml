@@ -1,76 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_signin"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.romanpr.passwordmanager.Signin"
+    android:measureWithLargestChild="false"
     android:orientation="vertical"
-    >
+    android:padding="10dp">
 
-    <LinearLayout
-        android:orientation="vertical"
+
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="100dp"
+        android:src="@drawable/utaa_logo"
+        android:layout_marginBottom="20dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:weightSum="1"
-        android:layout_marginTop="50dp">
+        android:text="@string/welcome_message"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:layout_marginBottom="50dp"/>
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/key"
-            android:id="@+id/imageView"
-            android:layout_weight="0.13"
-            android:layout_marginBottom="25dp" />
+    <EditText
+        android:id="@+id/username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/hint_email"
+        android:inputType="textEmailAddress"/>
 
-        <TextView
-            android:text="Username"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView"
-            android:gravity="center"/>
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:hint="@string/hint_password"/>
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:ems="10"
-            android:id="@+id/editTextUsername"
-            android:gravity="center"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp" />
+    <Button
+        android:id="@+id/login_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/action_sign_in"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"/>
 
-        <TextView
-            android:text="Password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView2"
-            android:gravity="center"/>
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPassword"
-            android:ems="10"
-            android:id="@+id/editTextPassword"
-            android:gravity="center"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp" />
-
-        <Button
-            android:text="Login"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/buttonLogin"
-            android:onClick="buttonClickLogin"/>
-
-        <Button
-            android:text="Register"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/buttonRegister"
-            android:onClick="bRegister"/>
-    </LinearLayout>
+    <TextView android:id="@+id/link_signup"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="10dp"
+              android:text="@string/no_account"
+              android:gravity="center"/>
 </LinearLayout>

@@ -7,6 +7,8 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -114,6 +116,23 @@ public class RegisterActivity extends Activity {
             createMasterAccount(username, password);
         } else{
             Toast.makeText(this, "Some fields are invalid", Toast.LENGTH_SHORT);
+        }
+    }
+
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+        EditText etStudentId = (EditText) findViewById(R.id.student_id);
+        // Check which radio button was clicked
+        switch(view.getId()) {
+            case R.id.radio_student:
+                if (checked)
+                    etStudentId.setVisibility(View.VISIBLE);
+                    break;
+            case R.id.radio_professor:
+                if (checked)
+                    etStudentId.setVisibility(View.GONE);
+                    break;
         }
     }
 }

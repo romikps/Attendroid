@@ -13,4 +13,13 @@
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="welcome_message">Welcome to Attendroid!</string>
+    <string name="student">Student</string>
+    <string name="professor">Professor</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="student_id">Student ID</string>
+    <string name="faculty">Faculty</string>
+    <string name="department">Department</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="no_account">No account yet? Create one</string>
 </resources>

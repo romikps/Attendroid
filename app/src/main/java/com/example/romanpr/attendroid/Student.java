@@ -6,17 +6,17 @@ package com.example.romanpr.attendroid;
 
 public class Student extends User {
 
-    String studentId;
+    long studentId;
 
     public Student() {}
 
     public Student(String firstName, String lastName,
-                   String email, String uid, String studentId) {
-        super(firstName, lastName, email, uid, Role.Student);
+                   String email, String uid, String faculty, String department, long studentId) {
+        super(firstName, lastName, email, uid, faculty, department, Role.Student);
         this.studentId = studentId;
     }
 
-    public String getStudentId() {
+    public long getStudentId() {
         return studentId;
     }
 
