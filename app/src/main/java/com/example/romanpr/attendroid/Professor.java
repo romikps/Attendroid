@@ -11,6 +11,10 @@ public class Professor extends User {
 
     List<String> courseIds;
 
+    public Professor() {
+        // Default constructor required for calls to DataSnapshot.getValue(User.class)
+    }
+
     public Professor(String firstName, String lastName,
                    String email, String faculty, String department) {
         super(firstName, lastName, email, faculty, department, Role.Professor);

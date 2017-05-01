@@ -44,8 +44,8 @@ public class RegisterActivity extends Activity {
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in: " + user.getUid());
-                    database = FirebaseDatabase.getInstance().getReference(user.getUid());
-                    database.setValue(newUser);
+                    database = FirebaseDatabase.getInstance().getReference();
+                    database.child(newUser.getRole().toLowerCase() + "s").child(user.getUid()).setValue(newUser);
                     Intent intent = new Intent(getBaseContext(), MainActivity.class);
                     intent.putExtra("USER_ID", user.getUid());
                     startActivity(intent);

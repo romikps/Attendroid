@@ -7,17 +7,25 @@ package com.example.romanpr.attendroid;
 public class Student extends User {
 
     long studentId;
+    int points;
 
-    public Student() {}
+    public Student() {
+        // Default constructor required for calls to DataSnapshot.getValue(User.class)
+    }
 
     public Student(String firstName, String lastName,
                    String email, String faculty, String department, long studentId) {
         super(firstName, lastName, email, faculty, department, Role.Student);
         this.studentId = studentId;
+        this.points = 0;
     }
 
     public long getStudentId() {
         return studentId;
+    }
+
+    public int getPoints() {
+        return points;
     }
 
     @Override

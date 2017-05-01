@@ -11,20 +11,23 @@ public class Course {
 
     String courseName;
     String professorUid;
-    List<ClassTime> hours;
+    
+    List<ClassTime> schedule;
     List<String> studentUids;
+    boolean isActive;
 
     public Course() {}
 
     public Course(String name, String professorUid) {
         this.courseName = name;
         this.professorUid = professorUid;
-        hours = new ArrayList<>();
+        schedule = new ArrayList<>();
         studentUids = new ArrayList<>();
+        this.isActive = true;
     }
 
-    public void addCourseHours(DayOfWeek dayOfWeek, String startingTime, String endingTime) {
-        hours.add(new ClassTime(dayOfWeek, startingTime, endingTime));
+    public void addClassTime(DayOfWeek dayOfWeek, String startingTime, String endingTime) {
+        schedule.add(new ClassTime(dayOfWeek, startingTime, endingTime));
     }
 
     public String getCourseName() {
@@ -35,11 +38,19 @@ public class Course {
         return professorUid;
     }
 
-    public List<ClassTime> getHours() {
-        return hours;
+    public List<ClassTime> getSchedule() {
+        return schedule;
     }
 
     public List<String> getStudentUids() {
         return studentUids;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }

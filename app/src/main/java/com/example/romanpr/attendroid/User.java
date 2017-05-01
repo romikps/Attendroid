@@ -1,5 +1,8 @@
 package com.example.romanpr.attendroid;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by romanpr on 4/22/2017.
  */
@@ -8,8 +11,12 @@ public abstract class User {
 
     String firstName, lastName, email, faculty, department;
     Role role;
+    boolean isActive;
+    Map<String, Double> attendanceData;
 
-    public User() {}
+    public User() {
+        // Default constructor required for calls to DataSnapshot.getValue(User.class)
+    }
 
     public User(String firstName, String lastName, String email, String faculty, String department, Role role) {
         this.firstName = firstName;
@@ -18,6 +25,8 @@ public abstract class User {
         this.faculty = faculty;
         this.department = department;
         this.role = role;
+        this.isActive = true;
+        this.attendanceData = new HashMap<>();
     }
 
     public String getFirstName() {
@@ -42,6 +51,18 @@ public abstract class User {
 
     public String getDepartment() {
         return department;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public Map<String, Double> getAttendanceData() {
+        return attendanceData;
     }
 
     @Override
