@@ -15,6 +15,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+/*
+Dummy user:
+    testy@thk.edu.tr
+    qwerty123
+ */
 public class LoginActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
@@ -24,16 +29,12 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        // Setting up authentication
         mAuth = FirebaseAuth.getInstance();
-
-        /*
-        Notifies the app whenever the user signs in or signs out.
-         */
-        signOut();
+        // Notifies the app whenever the user signs in or signs out
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -41,19 +42,21 @@ public class LoginActivity extends AppCompatActivity {
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    DataMaster.userDb = new Database(user.getUid());
-                    changeActivity();
+                    Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                    intent.putExtra("USER_ID", user.getUid());
+                    startActivity(intent);
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
             }
         };
+        signOut();
     }
 
+    // Attach the listener to your FirebaseAuth instance in the onStart() method and remove it on onStop()
     @Override
     public void onStart() {
-
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
         Log.d(TAG, "onStart:addAuthStateListener");
@@ -61,7 +64,6 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     public void onStop() {
-
         super.onStop();
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
@@ -69,22 +71,20 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    /*
-    Attempts to log in the user with their account's email and password passed as the arguments.
-     */
+    // Attempts to log in the user with their account's email and password passed as arguments
     private void signIn(String email, String password) {
-
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signIn:onComplete: " + task.isSuccessful());
-
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
+                        Log.d(TAG, "signInWithEmail:onComplete: " + task.isSuccessful());
+                        /*
+                        If sign-in fails, display a message to the user. If sign-in succeeds
+                        the auth state listener will be notified and logic to handle the
+                        signed in user can be handled in the listener.
+                         */
                         if (!task.isSuccessful()) {
-                            Log.w(TAG, "signIn:failed", task.getException());
+                            Log.w(TAG, "signInWithEmail:failed", task.getException());
                             Toast.makeText(LoginActivity.this, R.string.auth_failed,
                                     Toast.LENGTH_SHORT).show();
                         }
@@ -92,13 +92,9 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    /*
-    Logs out the currently logged in user.
-     */
+    // Logs out the currently logged in user
     public void signOut() {
-
         FirebaseUser currentUser = mAuth.getCurrentUser();
-
         if (currentUser != null) {
             mAuth.signOut();
             Log.d(TAG, "Signed out: " + currentUser.getUid());
@@ -107,34 +103,23 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    public void changeActivity() {
-
-        Intent myIntent = new Intent(this, ShowServices.class);
-        startActivity(myIntent);
-    }
-
     // On-click listener of the login button
-    public void buttonClickLogin(View view) {
-
-        EditText etUsername = (EditText) findViewById(R.id.editTextUsername);
-        EditText etPassword = (EditText) findViewById(R.id.editTextPassword);
+    public void onLoginButtonClicked(View view) {
+        EditText etUsername = (EditText) findViewById(R.id.username);
+        EditText etPassword = (EditText) findViewById(R.id.password);
         String username = etUsername.getText().toString();
         String password = etPassword.getText().toString();
-        // Required to encrypt new passwords
-        DataMaster.masterHash = PMCrypto.whirlpoolDigest(password.getBytes());
-
         // User input validation
         if(username.length() > 0 && password.length() > 0){
             signIn(username, password);
         }else{
-            Toast.makeText(this, "Invalid username or password", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.auth_failed, Toast.LENGTH_SHORT).show();
         }
     }
 
-    // On-click listener of the register button
-    public void bRegister(View view) {
-
-        Intent it = new Intent(this, RegisterActivity.class);
-        startActivity(it);
+    // On-click listener of the register link
+    public void onSignupLinkClicked(View view) {
+        Intent intent = new Intent(this, RegisterActivity.class);
+        startActivity(intent);
     }
 }

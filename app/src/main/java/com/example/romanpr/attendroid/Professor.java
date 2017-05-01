@@ -12,8 +12,8 @@ public class Professor extends User {
     List<String> courseIds;
 
     public Professor(String firstName, String lastName,
-                   String email, String uid, String faculty, String department) {
-        super(firstName, lastName, email, uid, faculty, department, Role.Professor);
+                   String email, String faculty, String department) {
+        super(firstName, lastName, email, faculty, department, Role.Professor);
         this.courseIds = new ArrayList<>();
     }
 }

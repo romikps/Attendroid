@@ -6,16 +6,15 @@ package com.example.romanpr.attendroid;
 
 public abstract class User {
 
-    String firstName, lastName, email, uid, faculty, department;
+    String firstName, lastName, email, faculty, department;
     Role role;
 
     public User() {}
 
-    public User(String firstName, String lastName, String email, String uid, String faculty, String department, Role role) {
+    public User(String firstName, String lastName, String email, String faculty, String department, Role role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.uid = uid;
         this.faculty = faculty;
         this.department = department;
         this.role = role;
@@ -37,10 +36,6 @@ public abstract class User {
         return email;
     }
 
-    public String getUid() {
-        return uid;
-    }
-
     public String getFaculty() {
         return faculty;
     }
@@ -54,7 +49,6 @@ public abstract class User {
         return
                 "name: " + getFirstName() + " " + getLastName() + "\n"
                         + "e-mail: " + getEmail() + "\n"
-                        + "uid: " + getUid() + "\n"
                         + "faculty: " + getFaculty() + "\n"
                         + "department: " + getDepartment() + "\n"
                         + "role: " + getRole() + "\n";

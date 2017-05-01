@@ -87,6 +87,7 @@
     </LinearLayout>
 
     <RadioGroup
+        android:id="@+id/roleRadioGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -96,16 +97,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/student"
-            android:onClick="onRadioButtonClicked"/>
+            android:onClick="onRadioButtonClicked"
+            android:text="@string/student"/>
 
         <RadioButton
             android:id="@+id/radio_professor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/professor"
-            android:onClick="onRadioButtonClicked"/>
+            android:onClick="onRadioButtonClicked"
+            android:text="@string/professor"/>
     </RadioGroup>
 
     <EditText
@@ -118,10 +119,11 @@
         android:visibility="gone"/>
 
     <Button
-        android:id="@+id/login_button"
+        android:id="@+id/register_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"
-        android:text="@string/action_register"/>
+        android:text="@string/action_register"
+        android:onClick="onRegisterButtonClicked"/>
 </LinearLayout>

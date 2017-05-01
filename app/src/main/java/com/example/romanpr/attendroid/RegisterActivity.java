@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +17,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class RegisterActivity extends Activity {
 
@@ -23,25 +26,29 @@ public class RegisterActivity extends Activity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private static final String TAG = "RegisterActivity";
 
+    private DatabaseReference database;
+    private User newUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
+        // Setting up authentication
         mAuth = FirebaseAuth.getInstance();
-
-
-        // Notifies the app whenever the user signs in or signs out.
+        // Notifies the app whenever the user signs in or signs out
         mAuthListener = new FirebaseAuth.AuthStateListener() {
-
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    DataMaster.userDb = new Database(user.getUid());
-                    changeActivity();
+                    Log.d(TAG, "onAuthStateChanged:signed_in: " + user.getUid());
+                    database = FirebaseDatabase.getInstance().getReference(user.getUid());
+                    database.setValue(newUser);
+                    Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                    intent.putExtra("USER_ID", user.getUid());
+                    startActivity(intent);
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
@@ -50,9 +57,9 @@ public class RegisterActivity extends Activity {
         };
     }
 
+    // Attach the listener to your FirebaseAuth instance in the onStart() method and remove it on onStop()
     @Override
     public void onStart() {
-
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
         Log.d(TAG, "onStart:addAuthStateListener");
@@ -60,7 +67,6 @@ public class RegisterActivity extends Activity {
 
     @Override
     public void onStop() {
-
         super.onStop();
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
@@ -74,48 +80,59 @@ public class RegisterActivity extends Activity {
     In the callback, you can use the getCurrentUser method
     to get the user's account data.
      */
-    private void createMasterAccount(String email, String password) {
-
+    protected void createAccount(String email, String password) {
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-
-                        Log.d(TAG, "createMasterAccount:onComplete: " + task.isSuccessful());
-
+                        Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
                         if (!task.isSuccessful()) {
-                            Log.w(TAG, "createMasterAccount:failed", task.getException());
-                            Toast.makeText(RegisterActivity.this, R.string.auth_failed,
+                            Log.w(TAG, "createUserWithEmail:failed", task.getException());
+                            Toast.makeText(RegisterActivity.this, R.string.reg_failed,
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
     }
 
-    public void changeActivity() {
-
-        Intent myIntent = new Intent(this, ShowServices.class);
-        startActivity(myIntent);
-    }
-
     // On-click listener of the register button
-    public void buttonClickRegister(View view) {
+    public void onRegisterButtonClicked(View view) {
+        EditText etFirstName = (EditText) findViewById(R.id.first_name);
+        EditText etLastName = (EditText) findViewById(R.id.last_name);
+        EditText etUsername = (EditText) findViewById(R.id.username);
+        EditText etPassword = (EditText) findViewById(R.id.password);
+        EditText etFaculty = (EditText) findViewById(R.id.faculty);
+        EditText etDepartment = (EditText) findViewById(R.id.department);
+        RadioGroup rgRole = (RadioGroup) findViewById(R.id.roleRadioGroup);
 
-        EditText etUsername = (EditText) findViewById(R.id.editTextRegisterUsername);
-        EditText etPassword = (EditText) findViewById(R.id.editTextRegisterPassword);
-        EditText etConfirmPassword = (EditText) findViewById(R.id.editTextConfimePassword);
-
-        String username = etUsername.getText().toString();
-        String password = etPassword.getText().toString();
-        String confirmPassword = etConfirmPassword.getText().toString();
+        switch (rgRole.getCheckedRadioButtonId()) {
+            case R.id.radio_student:
+                EditText etStudentId = (EditText) findViewById(R.id.student_id);
+                long studentId = Long.parseLong(etStudentId.getText().toString());
+                newUser = new Student(
+                        etFirstName.getText().toString(),
+                        etLastName.getText().toString(),
+                        etUsername.getText().toString(),
+                        etFaculty.getText().toString(),
+                        etDepartment.getText().toString(),
+                        studentId);
+                break;
+            case R.id.radio_professor:
+                newUser = new Professor(
+                        etFirstName.getText().toString(),
+                        etLastName.getText().toString(),
+                        etUsername.getText().toString(),
+                        etFaculty.getText().toString(),
+                        etDepartment.getText().toString()
+                );
+        }
 
         // User input validation
-        if(username.length() > 0 && password.length() > 0 && password.equals(confirmPassword)) {
-            // Required to encrypt new passwords
-            DataMaster.masterHash = PMCrypto.whirlpoolDigest(password.getBytes());
-            createMasterAccount(username, password);
+        if(etUsername.getText().toString().trim() != ""
+                && etPassword.getText().toString().trim() != "") {
+            createAccount(etUsername.getText().toString(), etPassword.getText().toString());
         } else{
-            Toast.makeText(this, "Some fields are invalid", Toast.LENGTH_SHORT);
+            Toast.makeText(this, R.string.invalid_fields, Toast.LENGTH_SHORT);
         }
     }
 

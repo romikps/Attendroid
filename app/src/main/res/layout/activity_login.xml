@@ -44,12 +44,14 @@
         android:layout_height="wrap_content"
         android:text="@string/action_sign_in"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="20dp"
+        android:onClick="onLoginButtonClicked"/>
 
     <TextView android:id="@+id/link_signup"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
               android:layout_marginTop="10dp"
               android:text="@string/no_account"
-              android:gravity="center"/>
+              android:gravity="center"
+              android:onClick="onSignupLinkClicked"/>
 </LinearLayout>

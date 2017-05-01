@@ -11,8 +11,8 @@ public class Student extends User {
     public Student() {}
 
     public Student(String firstName, String lastName,
-                   String email, String uid, String faculty, String department, long studentId) {
-        super(firstName, lastName, email, uid, faculty, department, Role.Student);
+                   String email, String faculty, String department, long studentId) {
+        super(firstName, lastName, email, faculty, department, Role.Student);
         this.studentId = studentId;
     }
 
