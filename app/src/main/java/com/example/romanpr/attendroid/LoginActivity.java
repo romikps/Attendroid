@@ -17,7 +17,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 /*
 Dummy user:
-    testy@thk.edu.tr
+    dum@thk.edu.tr
     qwerty123
  */
 public class LoginActivity extends AppCompatActivity {
@@ -51,7 +51,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         };
-        signOut();
+        // signOut();
     }
 
     // Attach the listener to your FirebaseAuth instance in the onStart() method and remove it on onStop()

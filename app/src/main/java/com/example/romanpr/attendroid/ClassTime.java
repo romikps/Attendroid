@@ -6,25 +6,23 @@ package com.example.romanpr.attendroid;
 
 public class ClassTime {
 
-    Time startingTime, endingTime;
+    String startingTime, endingTime;
     DayOfWeek day;
+
+    public ClassTime() {}
 
     public ClassTime(DayOfWeek dayOfWeek, String startingTime, String endingTime) {
         this.day = dayOfWeek;
-        this.startingTime = new Time(startingTime);
-        this.endingTime = new Time(endingTime);
+        this.startingTime = startingTime;
+        this.endingTime = endingTime;
     }
 
     public String getStartingTime() {
-        return startingTime.toString();
+        return startingTime;
     }
 
     public String getEndingTime() {
-        return endingTime.toString();
-    }
-
-    public int getDurationInHours() {
-        return endingTime.hours - startingTime.hours;
+        return endingTime;
     }
 
     public String getDay() {

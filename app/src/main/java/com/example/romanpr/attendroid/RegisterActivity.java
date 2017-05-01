@@ -46,9 +46,19 @@ public class RegisterActivity extends Activity {
                     Log.d(TAG, "onAuthStateChanged:signed_in: " + user.getUid());
                     database = FirebaseDatabase.getInstance().getReference();
                     database.child(newUser.getRole().toLowerCase() + "s").child(user.getUid()).setValue(newUser);
-                    Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                    intent.putExtra("USER_ID", user.getUid());
-                    startActivity(intent);
+                    switch (Role.valueOf(newUser.getRole())) {
+                        case Student:
+                            Intent intent = new Intent(getBaseContext(), MainActivity.class);
+                            intent.putExtra("USER_ID", user.getUid());
+                            startActivity(intent);
+                            break;
+                        case Professor:
+                            Toast.makeText(getBaseContext(), "Good day, Professor!", Toast.LENGTH_SHORT);
+                            break;
+                        case Admin:
+                            Toast.makeText(getBaseContext(), "Good day, Mr. Administrator!", Toast.LENGTH_SHORT);
+                            break;
+                    }
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");

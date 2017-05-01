@@ -23,4 +23,5 @@
     <string name="reg_failed">Couldn\'t register this account</string>
     <string name="auth_failed">Couldn\'t sign in</string>
     <string name="invalid_fields">Some fields are invalid</string>
+    <string name="points_format">%1$d pts</string>
 </resources>
