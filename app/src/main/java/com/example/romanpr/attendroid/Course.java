@@ -14,16 +14,20 @@ public class Course {
     
     List<ClassTime> schedule;
     List<String> studentUids;
+    int totalHours;
     boolean isActive;
+    String courseId;
 
     public Course() {}
 
-    public Course(String name, String professorUid) {
+    public Course(String name, String professorUid, int totalHours, String courseId) {
         this.courseName = name;
         this.professorUid = professorUid;
-        schedule = new ArrayList<>();
-        studentUids = new ArrayList<>();
+        this.schedule = new ArrayList<>();
+        this.studentUids = new ArrayList<>();
+        this.totalHours = totalHours;
         this.isActive = true;
+        this.courseId = courseId;
     }
 
     public void addClassTime(DayOfWeek dayOfWeek, String startingTime, String endingTime) {
@@ -52,5 +56,13 @@ public class Course {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public int getTotalHours() {
+        return totalHours;
+    }
+
+    public String getCourseId() {
+        return courseId;
     }
 }

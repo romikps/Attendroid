@@ -12,7 +12,7 @@ public abstract class User {
     String firstName, lastName, email, faculty, department;
     Role role;
     boolean isActive;
-    Map<String, Double> attendanceData;
+    Map<String, Integer> attendanceData;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -61,7 +61,7 @@ public abstract class User {
         isActive = active;
     }
 
-    public Map<String, Double> getAttendanceData() {
+    public Map<String, Integer> getAttendanceData() {
         return attendanceData;
     }
 

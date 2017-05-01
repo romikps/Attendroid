@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     DatabaseReference studentData;
     RecyclerView courseRecyclerView;
     CourseAdapter adapter;
-
+    Student student;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
                 // Log.d(TAG, "Value is: " + dataSnapshot.getValue().toString());
-                final Student student = dataSnapshot.getValue(Student.class);
+                student = dataSnapshot.getValue(Student.class);
                 TextView tvStudentName = (TextView) findViewById(R.id.student_name);
                 TextView tvStudentNumber = (TextView) findViewById(R.id.student_number);
                 TextView tvTotalPoints = (TextView) findViewById(R.id.total_points);
@@ -91,11 +92,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class CourseHolder extends RecyclerView.ViewHolder {
-        public TextView titleTextView;
+        private Course course;
+        private TextView tvCourseName;
+        private TextView tvAttendanceStatus;
+        private ProgressBar attendanceProgressBar;
         public CourseHolder(View itemView) {
             super(itemView);
-            titleTextView = (TextView) itemView;
+            tvCourseName = (TextView) itemView.findViewById(R.id.course_name);
+            tvAttendanceStatus = (TextView) itemView.findViewById(R.id.attendance_status);
+            attendanceProgressBar = (ProgressBar) itemView.findViewById(R.id.attendance_progress_bar);
         }
+
+        public void bindCourse(Course course) {
+            this.course = course;
+            int hoursAttended = student.getAttendanceData().get(course.getCourseId());
+            tvCourseName.setText(course.getCourseName());
+            tvAttendanceStatus.setText(hoursAttended + "/" + course.getTotalHours());
+            attendanceProgressBar.setMax(course.getTotalHours());
+            attendanceProgressBar.setProgress(hoursAttended);
+        }
+
     }
 
     private class CourseAdapter extends RecyclerView.Adapter<CourseHolder> {
@@ -108,14 +124,14 @@ public class MainActivity extends AppCompatActivity {
         public CourseHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
             View view = layoutInflater
-                    .inflate(android.R.layout.simple_list_item_1, parent, false);
+                    .inflate(R.layout.list_item_course, parent, false);
             return new CourseHolder(view);
         }
 
         @Override
         public void onBindViewHolder(CourseHolder holder, int position) {
             Course course = courses.get(position);
-            holder.titleTextView.setText(course.getCourseName());
+            holder.bindCourse(course);
         }
 
         @Override
@@ -139,15 +155,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void createCourses() {
-        Course course = new Course("Mobile Architectures", "xP9uppVBvGdSRlARvw8w8nfC2T83");
+        String key = database.child("courses").push().getKey();
+        Course course = new Course("Mobile Architectures", "xP9uppVBvGdSRlARvw8w8nfC2T83", 50, key);
         course.addClassTime(DayOfWeek.Monday, "9:40", "11:20");
         course.addClassTime(DayOfWeek.Thursday, "13:40", "15:20");
-        database.child("courses").push().setValue(course);
-
-        Course course2 = new Course("Web Development", "xP9uppVBvGdSRlARvw8w8nfC2T83");
-        course.addClassTime(DayOfWeek.Monday, "9:40", "11:20");
-        course.addClassTime(DayOfWeek.Thursday, "13:40", "15:20");
-        database.child("courses").push().setValue(course);
-
+        database.child("courses").child(key).setValue(course);
     }
 }
