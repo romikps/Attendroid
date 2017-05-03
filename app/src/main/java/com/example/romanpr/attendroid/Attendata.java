@@ -12,6 +12,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -35,13 +38,16 @@ public class Attendata {
         return data;
     }
 
+    public static Attendata get(Context context) {
+        return data;
+    }
+
     private Attendata(final Context context, final String userId) {
         database = FirebaseDatabase.getInstance().getReference();
         database.child("students").child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 user = dataSnapshot.getValue(Student.class);
-                Log.d(TAG, user.toString());
                 database.child("courses").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -51,8 +57,7 @@ public class Attendata {
                                 courses.add(courseDataSnapshot.getValue(Course.class));
                             }
                         }
-                        for (Course c : courses)
-                            Log.d(TAG, c.toString());
+
                         Intent intent = new Intent(context, MainActivity.class);
                         intent.putExtra("USER_ID", userId);
                         context.startActivity(intent);

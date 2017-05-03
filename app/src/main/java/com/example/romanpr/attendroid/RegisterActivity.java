@@ -49,9 +49,7 @@ public class RegisterActivity extends Activity {
                     database.child(newUser.getRole().toLowerCase() + "s").child(user.getUid()).setValue(newUser);
                     switch (Role.valueOf(newUser.getRole())) {
                         case Student:
-                            Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                            intent.putExtra("USER_ID", user.getUid());
-                            startActivity(intent);
+                            Attendata userData = Attendata.get(getBaseContext(), user.getUid());
                             break;
                         case Professor:
                             Toast.makeText(getBaseContext(), "Good day, Professor!", Toast.LENGTH_SHORT);

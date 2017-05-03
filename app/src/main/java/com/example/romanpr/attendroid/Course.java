@@ -1,6 +1,7 @@
 package com.example.romanpr.attendroid;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -66,12 +67,22 @@ public class Course {
         return courseId;
     }
 
+    public String getClassHours() {
+        String classHours = "";
+        Collections.sort(schedule);
+        for (ClassTime time : schedule) {
+            classHours += time.toString() + "\n";
+        }
+        return classHours.trim();
+    }
+
     @Override
     public String toString() {
         return "Course {" +
                 "courseName='" + courseName + '\'' +
                 ", professorUid='" + professorUid + '\'' +
                 ", totalHours=" + totalHours +
+                ", isActive=" + isActive +
                 ", courseId='" + courseId + '\'' +
                 '}';
     }
