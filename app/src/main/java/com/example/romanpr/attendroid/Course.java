@@ -65,4 +65,14 @@ public class Course {
     public String getCourseId() {
         return courseId;
     }
+
+    @Override
+    public String toString() {
+        return "Course {" +
+                "courseName='" + courseName + '\'' +
+                ", professorUid='" + professorUid + '\'' +
+                ", totalHours=" + totalHours +
+                ", courseId='" + courseId + '\'' +
+                '}';
+    }
 }

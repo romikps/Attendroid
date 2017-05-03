@@ -9,7 +9,7 @@ import java.util.Map;
 
 public abstract class User {
 
-    String firstName, lastName, email, faculty, department;
+    String firstName, lastName, email, faculty, department, userId;
     Role role;
     boolean isActive;
     Map<String, Integer> attendanceData;
@@ -18,7 +18,8 @@ public abstract class User {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
     }
 
-    public User(String firstName, String lastName, String email, String faculty, String department, Role role) {
+    public User(String firstName, String lastName, String email,
+                String faculty, String department, Role role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -27,6 +28,7 @@ public abstract class User {
         this.role = role;
         this.isActive = true;
         this.attendanceData = new HashMap<>();
+        this.userId = "";
     }
 
     public String getFirstName() {
@@ -63,6 +65,14 @@ public abstract class User {
 
     public Map<String, Integer> getAttendanceData() {
         return attendanceData;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     @Override

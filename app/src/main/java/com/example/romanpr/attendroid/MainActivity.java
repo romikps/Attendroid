@@ -1,5 +1,6 @@
 package com.example.romanpr.attendroid;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -43,8 +45,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         String userId = getIntent().getStringExtra("USER_ID");
+        Attendata userData = Attendata.get(this, userId);
+
         courseRecyclerView = (RecyclerView) findViewById(R.id.course_recycler_view);
         courseRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         database = FirebaseDatabase.getInstance().getReference();
         studentData = FirebaseDatabase.getInstance().getReference().child("students").child(userId);
         studentData.addValueEventListener(new ValueEventListener() {
@@ -160,5 +165,19 @@ public class MainActivity extends AppCompatActivity {
         course.addClassTime(DayOfWeek.Monday, "9:40", "11:20");
         course.addClassTime(DayOfWeek.Thursday, "13:40", "15:20");
         database.child("courses").child(key).setValue(course);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_show_schedule:
+                Intent intent = new Intent(this, ScheduleActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.menu_item_show_leader_board:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

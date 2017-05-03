@@ -42,9 +42,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                    intent.putExtra("USER_ID", user.getUid());
-                    startActivity(intent);
+                    Attendata userData = Attendata.get(getBaseContext(), user.getUid());
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
