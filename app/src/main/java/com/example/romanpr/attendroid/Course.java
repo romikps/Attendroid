@@ -2,7 +2,9 @@ package com.example.romanpr.attendroid;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by romanpr on 4/22/2017.
@@ -11,44 +13,40 @@ import java.util.List;
 public class Course {
 
     String courseName;
-    String professorUid;
+    String professor;
     
-    List<ClassTime> schedule;
-    List<String> studentUids;
+    Map<String, ClassTime> schedule;
+    Map<String, Boolean> students;
     int totalHours;
     boolean isActive;
     String courseId;
 
     public Course() {}
 
-    public Course(String name, String professorUid, int totalHours, String courseId) {
+    public Course(String name, String professor, int totalHours, String courseId) {
         this.courseName = name;
-        this.professorUid = professorUid;
-        this.schedule = new ArrayList<>();
-        this.studentUids = new ArrayList<>();
+        this.professor = professor;
+        this.schedule = new HashMap<>();
+        this.students = new HashMap<>();
         this.totalHours = totalHours;
         this.isActive = true;
         this.courseId = courseId;
-    }
-
-    public void addClassTime(DayOfWeek dayOfWeek, String startingTime, String endingTime) {
-        schedule.add(new ClassTime(dayOfWeek, startingTime, endingTime));
     }
 
     public String getCourseName() {
         return courseName;
     }
 
-    public String getProfessorUid() {
-        return professorUid;
+    public String getProfessor() {
+        return professor;
     }
 
-    public List<ClassTime> getSchedule() {
+    public Map<String, ClassTime> getSchedule() {
         return schedule;
     }
 
-    public List<String> getStudentUids() {
-        return studentUids;
+    public Map<String, Boolean> getStudents() {
+        return students;
     }
 
     public boolean isActive() {
@@ -68,22 +66,13 @@ public class Course {
     }
 
     public String getClassHours() {
-        String classHours = "";
-        Collections.sort(schedule);
-        for (ClassTime time : schedule) {
-            classHours += time.toString() + "\n";
+        String strClassHours = "";
+        List<ClassTime> classHours = new ArrayList<>();
+        classHours.addAll(schedule.values());
+        Collections.sort(classHours);
+        for (ClassTime time : classHours) {
+            strClassHours += time.toString() + "\n";
         }
-        return classHours.trim();
-    }
-
-    @Override
-    public String toString() {
-        return "Course {" +
-                "courseName='" + courseName + '\'' +
-                ", professorUid='" + professorUid + '\'' +
-                ", totalHours=" + totalHours +
-                ", isActive=" + isActive +
-                ", courseId='" + courseId + '\'' +
-                '}';
+        return strClassHours.trim();
     }
 }

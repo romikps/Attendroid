@@ -13,7 +13,7 @@ public abstract class User {
     String firstName, lastName, email, faculty, department, userId;
     Role role;
     boolean isActive;
-    ArrayList<String> courses;
+    Map<String, Boolean> courses;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -29,7 +29,7 @@ public abstract class User {
         this.role = role;
         this.isActive = true;
         this.userId = "";
-        this.courses = new ArrayList<>();
+        this.courses = new HashMap<>();
     }
 
     public String getFirstName() {
@@ -72,7 +72,7 @@ public abstract class User {
         this.userId = userId;
     }
 
-    public ArrayList<String> getCourses() {
+    public Map<String, Boolean> getCourses() {
         return courses;
     }
 

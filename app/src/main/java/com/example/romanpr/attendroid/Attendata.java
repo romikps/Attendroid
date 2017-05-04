@@ -3,7 +3,6 @@ package com.example.romanpr.attendroid;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -12,9 +11,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,7 +85,7 @@ public class Attendata {
                 for (DataSnapshot dsCourse : dsCourses.getChildren()) {
                     course = dsCourse.getValue(Course.class);
                     allCourses.put(dsCourse.getKey(), course.getCourseName());
-                    if (user.getCourses().contains(dsCourse.getKey())) {
+                    if (user.getCourses().keySet().contains(dsCourse.getKey())) {
                         courses.add(course);
                     }
                 }
@@ -130,5 +126,34 @@ public class Attendata {
 
     public Map<String, String> getAllProfessors() {
         return allProfessors;
+    }
+
+    public void addCourse(String courseId, String studentId) {
+        // Simultaneous
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("students/" + studentId + "/attendanceData/" + courseId, 0);
+        updates.put("students/" + studentId + "/courses/" + courseId, true);
+        updates.put("courses/" + courseId + "/students/" + studentId, true);
+        database.updateChildren(updates);
+    }
+
+    public void dropCourse(String courseId, String studentId) {
+        // Simultaneous
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("students/" + studentId + "/attendanceData/" + courseId, null);
+        updates.put("students/" + studentId + "/courses/" + courseId, null);
+        updates.put("courses/" + courseId + "/students/" + studentId, null);
+        database.updateChildren(updates);
+    }
+
+    public void createCourses() {
+        String courseId = database.child("courses").push().getKey();
+        Course course = new Course("Mobile Architectures", "xP9uppVBvGdSRlARvw8w8nfC2T83", 50, courseId);
+        database.child("courses").child(courseId).setValue(course);
+
+        String dayOfWeek = "Monday", startingTime = "9:40", endingTime = "11:20";
+        database.child("courses/" + courseId + "/schedule/")
+                .push().setValue(new ClassTime(DayOfWeek.valueOf(dayOfWeek), startingTime, endingTime));
+
     }
 }
