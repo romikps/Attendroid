@@ -1,5 +1,6 @@
 package com.example.romanpr.attendroid;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,7 +13,7 @@ public abstract class User {
     String firstName, lastName, email, faculty, department, userId;
     Role role;
     boolean isActive;
-    Map<String, Integer> attendanceData;
+    ArrayList<String> courses;
 
     public User() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -27,8 +28,8 @@ public abstract class User {
         this.department = department;
         this.role = role;
         this.isActive = true;
-        this.attendanceData = new HashMap<>();
         this.userId = "";
+        this.courses = new ArrayList<>();
     }
 
     public String getFirstName() {
@@ -63,16 +64,16 @@ public abstract class User {
         isActive = active;
     }
 
-    public Map<String, Integer> getAttendanceData() {
-        return attendanceData;
-    }
-
     public String getUserId() {
         return userId;
     }
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public ArrayList<String> getCourses() {
+        return courses;
     }
 
     @Override

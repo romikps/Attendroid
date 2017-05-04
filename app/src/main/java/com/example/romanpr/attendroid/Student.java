@@ -1,5 +1,8 @@
 package com.example.romanpr.attendroid;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by romanpr on 4/22/2017.
  */
@@ -8,6 +11,8 @@ public class Student extends User {
 
     long studentId;
     int points;
+    Map<String, Integer> attendanceData;
+
 
     public Student() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -18,6 +23,7 @@ public class Student extends User {
         super(firstName, lastName, email, faculty, department, Role.Student);
         this.studentId = studentId;
         this.points = 0;
+        this.attendanceData = new HashMap<>();
     }
 
     public long getStudentId() {
@@ -26,6 +32,10 @@ public class Student extends User {
 
     public int getPoints() {
         return points;
+    }
+
+    public Map<String, Integer> getAttendanceData() {
+        return attendanceData;
     }
 
     @Override
