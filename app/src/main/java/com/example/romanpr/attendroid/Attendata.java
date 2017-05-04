@@ -46,7 +46,7 @@ public class Attendata {
 
     private Attendata(final Context context, final String userId) {
         database = FirebaseDatabase.getInstance().getReference();
-        database.addListenerForSingleValueEvent(new ValueEventListener() {
+        database.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 courses = new ArrayList<>();
@@ -85,7 +85,8 @@ public class Attendata {
                 for (DataSnapshot dsCourse : dsCourses.getChildren()) {
                     course = dsCourse.getValue(Course.class);
                     allCourses.put(dsCourse.getKey(), course.getCourseName());
-                    if (user.getCourses().keySet().contains(dsCourse.getKey())) {
+                    if (user.getCourses() != null
+                            && user.getCourses().keySet().contains(dsCourse.getKey())) {
                         courses.add(course);
                     }
                 }
@@ -148,12 +149,20 @@ public class Attendata {
 
     public void createCourses() {
         String courseId = database.child("courses").push().getKey();
-        Course course = new Course("Mobile Architectures", "xP9uppVBvGdSRlARvw8w8nfC2T83", 50, courseId);
+        Course course = new Course("Algorithms & Data Structures", "xP9uppVBvGdSRlARvw8w8nfC2T83", 50, courseId);
         database.child("courses").child(courseId).setValue(course);
 
-        String dayOfWeek = "Monday", startingTime = "9:40", endingTime = "11:20";
+        String dayOfWeek = "Friday", startingTime = "10:40", endingTime = "11:20";
         database.child("courses/" + courseId + "/schedule/")
                 .push().setValue(new ClassTime(DayOfWeek.valueOf(dayOfWeek), startingTime, endingTime));
+
+        dayOfWeek = "Thursday";
+        startingTime = "13:40";
+        endingTime = "15:30";
+
+        database.child("courses/" + courseId + "/schedule/")
+                .push().setValue(new ClassTime(DayOfWeek.valueOf(dayOfWeek), startingTime, endingTime));
+
 
     }
 }

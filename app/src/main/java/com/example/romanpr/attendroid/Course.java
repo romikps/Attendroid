@@ -1,5 +1,7 @@
 package com.example.romanpr.attendroid;
 
+import com.google.firebase.database.Exclude;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -65,6 +67,7 @@ public class Course {
         return courseId;
     }
 
+    @Exclude
     public String getClassHours() {
         String strClassHours = "";
         List<ClassTime> classHours = new ArrayList<>();
