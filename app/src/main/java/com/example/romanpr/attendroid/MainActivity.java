@@ -1,10 +1,18 @@
 package com.example.romanpr.attendroid;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,21 +21,30 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+    private final int REQUEST_PERMISSION_LOCATION = 1;
     RecyclerView courseRecyclerView;
     CourseAdapter adapter;
     Attendata userData;
     Student student;
 
+    LocationManager locationManager;
+    Location location;
+    String provider;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        provider = locationManager.getBestProvider(new Criteria(), false);
 
         String userId = getIntent().getStringExtra("USER_ID");
         userData = Attendata.get(this, userId);
@@ -113,6 +130,40 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public void onGiveAttendanceClicked(View view) {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[] {
+                            android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                            android.Manifest.permission.ACCESS_FINE_LOCATION
+                    },
+                    REQUEST_PERMISSION_LOCATION);
+        } else {
+            location = locationManager.getLastKnownLocation(provider);
+            Toast.makeText(this, "Latitude: " + location.getLatitude()
+                    + "\nLongitude: " + location.getLongitude(), Toast.LENGTH_LONG).show();
+        }
+        location = locationManager.getLastKnownLocation(provider);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_PERMISSION_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this, "Latitude: " + location.getLatitude()
+                            + "\nLongitude: " + location.getLongitude(), Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, "No Permission :(", Toast.LENGTH_SHORT).show();
+                }
+                return;
+            }
         }
     }
 }

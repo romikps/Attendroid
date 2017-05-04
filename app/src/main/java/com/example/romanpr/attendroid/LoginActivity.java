@@ -49,7 +49,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         };
-        signOut();
+        // signOut();
     }
 
     // Attach the listener to your FirebaseAuth instance in the onStart() method and remove it on onStop()
