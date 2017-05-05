@@ -23,6 +23,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -144,8 +145,9 @@ public class MainActivity extends AppCompatActivity {
                     REQUEST_PERMISSION_LOCATION);
         } else {
             location = locationManager.getLastKnownLocation(provider);
-            Toast.makeText(this, "Latitude: " + location.getLatitude()
-                    + "\nLongitude: " + location.getLongitude(), Toast.LENGTH_LONG).show();
+            DecimalFormat df = new DecimalFormat("#.##");
+            Toast.makeText(this, "Latitude: " + df.format(location.getLatitude())
+                    + "\nLongitude: " + df.format(location.getLongitude()), Toast.LENGTH_LONG).show();
         }
         location = locationManager.getLastKnownLocation(provider);
     }
