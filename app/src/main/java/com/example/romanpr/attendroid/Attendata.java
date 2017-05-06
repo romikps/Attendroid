@@ -63,7 +63,7 @@ public class Attendata {
                 for (DataSnapshot dsStudent : dsStudents.getChildren()) {
                     student = dsStudent.getValue(Student.class);
                     allStudents.put(dsStudent.getKey(),
-                            student.firstName + " " + student.lastName);
+                            student.getFirstName() + " " + student.getLastName() + " " + student.getStudentId());
                     if (dsStudent.getKey().equals(userId)) {
                         user = dsStudent.getValue(Student.class);
                     }
@@ -91,7 +91,7 @@ public class Attendata {
                     }
                 }
 
-                Intent intent = new Intent(context, MainActivity.class);
+                Intent intent = new Intent(context, AdminMainActivity.class);
                 intent.putExtra("USER_ID", userId);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);

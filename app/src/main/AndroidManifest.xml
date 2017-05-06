@@ -22,8 +22,9 @@
         </activity>
         <activity android:name=".RegisterActivity"/>
         <activity android:name=".MainActivity"/>
-        <activity android:name=".ScheduleActivity">
-        </activity>
+        <activity android:name=".ScheduleActivity"/>
+        <activity android:name=".AdminMainActivity"/>
+        <activity android:name=".AdminCourseActivity"/>
     </application>
 
 </manifest>
