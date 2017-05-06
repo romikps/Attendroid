@@ -148,22 +148,23 @@ public class Attendata {
         database.updateChildren(updates);
     }
 
-    public void createCourses() {
+    public void createCourse(String courseName, String professorId, int totalHours, List<ClassTime> classTimes) {
         String courseId = database.child("courses").push().getKey();
-        Course course = new Course("Algorithms & Data Structures", "xP9uppVBvGdSRlARvw8w8nfC2T83", 50, courseId);
+        Course course = new Course(courseName, professorId, totalHours, courseId);
         database.child("courses").child(courseId).setValue(course);
 
-        String dayOfWeek = "Friday", startingTime = "10:40", endingTime = "11:20";
-        database.child("courses/" + courseId + "/schedule/")
-                .push().setValue(new ClassTime(DayOfWeek.valueOf(dayOfWeek), startingTime, endingTime));
+        for (ClassTime classTime : classTimes) {
+            database.child("courses/" + courseId + "/schedule/")
+                    .push().setValue(classTime);
+        }
+    }
 
-        dayOfWeek = "Thursday";
-        startingTime = "13:40";
-        endingTime = "15:30";
-
-        database.child("courses/" + courseId + "/schedule/")
-                .push().setValue(new ClassTime(DayOfWeek.valueOf(dayOfWeek), startingTime, endingTime));
-
-
+    public static String getKey(Map<String, String> map, String value) {
+        for (String key : map.keySet()) {
+            if (map.get(key).equals(value)) {
+                return key;
+            }
+        }
+        return null;
     }
 }

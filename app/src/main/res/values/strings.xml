@@ -25,4 +25,6 @@
     <string name="invalid_fields">Some fields are invalid</string>
     <string name="points_format">%1$d pts</string>
     <string name="schedule">Schedule</string>
+    <string name="total_hours">Total Number of Hours</string>
+    <string name="professor_name">Teaching Professor\'s Name</string>
 </resources>

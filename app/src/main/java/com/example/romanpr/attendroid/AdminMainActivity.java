@@ -1,13 +1,16 @@
 package com.example.romanpr.attendroid;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.widget.*;
-import android.view.*;
-import android.content.*;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 public class AdminMainActivity extends AppCompatActivity {
     AutoCompleteTextView autoStudentName;
@@ -60,15 +63,6 @@ public class AdminMainActivity extends AppCompatActivity {
         }
     }
 
-    public String getKey(Map<String, String> map, String value) {
-        for (String key : map.keySet()) {
-            if (map.get(key).equals(value)) {
-                return key;
-            }
-        }
-        return null;
-    }
-
     public void addLectureToStudent(View v){
         //If student doesn't have the lecture,
         // Check if there's any collision with the lecture hours
@@ -80,8 +74,8 @@ public class AdminMainActivity extends AppCompatActivity {
         // error message saying they already have the lecture
         String studentName = autoStudentName.getText().toString();
         String courseName = autoCourseName.getText().toString();
-        String selectedStudentId = getKey(Attendata.get(this).getAllStudents(), studentName);
-        String selectedCourseId = getKey(Attendata.get(this).getAllCourses(), courseName);
+        String selectedStudentId = Attendata.getKey(Attendata.get(this).getAllStudents(), studentName);
+        String selectedCourseId = Attendata.getKey(Attendata.get(this).getAllCourses(), courseName);
         Attendata.get(this).addCourse(selectedCourseId, selectedStudentId);
     }
 
@@ -92,8 +86,8 @@ public class AdminMainActivity extends AppCompatActivity {
         //error message
         String studentName = autoStudentName.getText().toString();
         String courseName = autoCourseName.getText().toString();
-        String selectedStudentId = getKey(Attendata.get(this).getAllStudents(), studentName);
-        String selectedCourseId = getKey(Attendata.get(this).getAllCourses(), courseName);
+        String selectedStudentId = Attendata.getKey(Attendata.get(this).getAllStudents(), studentName);
+        String selectedCourseId = Attendata.getKey(Attendata.get(this).getAllCourses(), courseName);
         Attendata.get(this).dropCourse(selectedCourseId, selectedStudentId);
 
     }

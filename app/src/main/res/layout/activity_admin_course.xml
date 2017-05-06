@@ -10,45 +10,45 @@
 
 
     <TextView
+        android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="New Course"
-        android:id="@+id/textView3"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="36dp" />
+        android:layout_marginTop="15dp"
+        android:text="New Course"
+        android:textAppearance="?android:attr/textAppearanceLarge"/>
 
     <EditText
-        android:id="@+id/editText2"
+        android:id="@+id/etCourseName"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:paddingLeft="10dp"
+        android:layout_below="@+id/tvTitle"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
         android:background="@drawable/edittextradius"
         android:ems="10"
         android:hint="Course Name"
-        android:layout_marginTop="44dp"
-        android:layout_below="@+id/textView3"
-        android:layout_centerHorizontal="true" />
+        android:paddingLeft="10dp"/>
 
-    <Spinner
+    <AutoCompleteTextView
+        android:id="@+id/autoTeacher"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:id="@+id/spinner3"
-        android:layout_below="@+id/editText2"
-        android:layout_alignLeft="@+id/editText2"
-        android:layout_alignStart="@+id/editText2"
-        android:layout_marginTop="28dp"
-        android:layout_alignRight="@+id/editText2"
-        android:layout_alignEnd="@+id/editText2"
-        />
+        android:layout_alignEnd="@+id/etCourseName"
+        android:layout_alignLeft="@+id/etCourseName"
+        android:layout_alignRight="@+id/etCourseName"
+        android:layout_alignStart="@+id/etCourseName"
+        android:layout_below="@+id/etCourseName"
+        android:layout_marginTop="15dp"
+        android:hint="@string/professor_name"/>
 
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:text="Monday"
-        android:id="@+id/checkBox"
+        android:id="@+id/cbMon"
         android:checked="false"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
@@ -58,72 +58,72 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Tuesday"
-        android:id="@+id/checkBox2"
-        android:layout_below="@+id/checkBox"
-        android:layout_alignLeft="@+id/checkBox"
-        android:layout_alignStart="@+id/checkBox"
+        android:id="@+id/cbTue"
+        android:layout_below="@+id/cbMon"
+        android:layout_alignLeft="@+id/cbMon"
+        android:layout_alignStart="@+id/cbMon"
         android:checked="false" />
 
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Wednesday"
-        android:id="@+id/checkBox3"
-        android:layout_below="@+id/checkBox2"
-        android:layout_alignLeft="@+id/checkBox2"
-        android:layout_alignStart="@+id/checkBox2"
+        android:id="@+id/cbWed"
+        android:layout_below="@+id/cbTue"
+        android:layout_alignLeft="@+id/cbTue"
+        android:layout_alignStart="@+id/cbTue"
         android:checked="false" />
 
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Thursday"
-        android:id="@+id/checkBox4"
-        android:layout_below="@+id/checkBox3"
-        android:layout_alignLeft="@+id/checkBox3"
-        android:layout_alignStart="@+id/checkBox3"
+        android:id="@+id/cbThu"
+        android:layout_below="@+id/cbWed"
+        android:layout_alignLeft="@+id/cbWed"
+        android:layout_alignStart="@+id/cbWed"
         android:checked="false" />
 
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Friday"
-        android:id="@+id/checkBox5"
-        android:layout_below="@+id/checkBox4"
-        android:layout_alignLeft="@+id/checkBox4"
-        android:layout_alignStart="@+id/checkBox4"
+        android:id="@+id/cbFri"
+        android:layout_below="@+id/cbThu"
+        android:layout_alignLeft="@+id/cbThu"
+        android:layout_alignStart="@+id/cbThu"
         android:checked="false" />
 
     <EditText
+        android:id="@+id/etMonStart"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/cbTue"
+        android:layout_alignLeft="@+id/etTueStart"
+        android:layout_alignStart="@+id/etTueStart"
         android:background="@drawable/edittextradius"
-        android:paddingLeft = "10dp"
-        android:hint= "__:__"
-        android:id="@+id/editText"
-        android:layout_above="@+id/checkBox2"
-        android:layout_alignLeft="@+id/editText4"
-        android:layout_alignStart="@+id/editText4" />
+        android:hint="__:__"
+        android:paddingLeft="10dp"/>
+
+    <EditText
+        android:id="@+id/etMonFinish"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/cbTue"
+        android:layout_alignEnd="@+id/autoTeacher"
+        android:layout_alignRight="@+id/autoTeacher"
+        android:background="@drawable/edittextradius"
+        android:hint="__:__"
+        android:paddingLeft="10dp"/>
 
     <EditText
         android:layout_width="60dp"
         android:layout_height="wrap_content"
-        android:id="@+id/editText3"
-        android:hint= "__:__"
-        android:background="@drawable/edittextradius"
-        android:paddingLeft = "10dp"
-        android:layout_above="@+id/checkBox2"
-        android:layout_alignRight="@+id/spinner3"
-        android:layout_alignEnd="@+id/spinner3" />
-
-    <EditText
-        android:layout_width="60dp"
-        android:layout_height="wrap_content"
         android:background="@drawable/edittextradius"
         android:hint= "__:__"
         android:paddingLeft = "10dp"
-        android:id="@+id/editText4"
-        android:layout_above="@+id/checkBox3"
+        android:id="@+id/etTueStart"
+        android:layout_above="@+id/cbWed"
         android:layout_centerHorizontal="true" />
 
     <EditText
@@ -132,10 +132,10 @@
         android:background="@drawable/edittextradius"
         android:hint= "__:__"
         android:paddingLeft = "10dp"
-        android:id="@+id/editText5"
-        android:layout_alignTop="@+id/editText4"
-        android:layout_alignRight="@+id/spinner3"
-        android:layout_alignEnd="@+id/spinner3" />
+        android:id="@+id/etTueFinish"
+        android:layout_alignTop="@+id/etTueStart"
+        android:layout_alignRight="@+id/autoTeacher"
+        android:layout_alignEnd="@+id/autoTeacher" />
 
     <EditText
         android:layout_width="60dp"
@@ -143,10 +143,21 @@
         android:background="@drawable/edittextradius"
         android:hint= "__:__"
         android:paddingLeft = "10dp"
-        android:id="@+id/editText6"
-        android:layout_above="@+id/checkBox4"
-        android:layout_alignLeft="@+id/editText5"
-        android:layout_alignStart="@+id/editText5" />
+        android:id="@+id/etWedFinish"
+        android:layout_above="@+id/cbThu"
+        android:layout_alignLeft="@+id/etTueFinish"
+        android:layout_alignStart="@+id/etTueFinish" />
+
+    <EditText
+        android:id="@+id/etWedStart"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/cbWed"
+        android:layout_alignLeft="@+id/etThuStart"
+        android:layout_alignStart="@+id/etThuStart"
+        android:background="@drawable/edittextradius"
+        android:hint="__:__"
+        android:paddingLeft="10dp"/>
 
     <EditText
         android:layout_width="60dp"
@@ -154,10 +165,22 @@
         android:background="@drawable/edittextradius"
         android:hint= "__:__"
         android:paddingLeft = "10dp"
-        android:id="@+id/editText7"
-        android:layout_alignBottom="@+id/checkBox3"
-        android:layout_alignLeft="@+id/editText8"
-        android:layout_alignStart="@+id/editText8" />
+        android:id="@+id/etThuStart"
+        android:layout_alignBottom="@+id/cbThu"
+        android:layout_alignLeft="@+id/etFriStart"
+        android:layout_alignStart="@+id/etFriStart" />
+
+    <EditText
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edittextradius"
+        android:id="@+id/etThuFinish"
+        android:hint= "__:__"
+        android:paddingLeft = "10dp"
+
+        android:layout_alignTop="@+id/etThuStart"
+        android:layout_alignLeft="@+id/etWedFinish"
+        android:layout_alignStart="@+id/etWedFinish" />
 
     <EditText
         android:layout_width="60dp"
@@ -165,53 +188,41 @@
         android:background="@drawable/edittextradius"
         android:hint= "__:__"
         android:paddingLeft = "10dp"
-        android:id="@+id/editText8"
-        android:layout_alignBottom="@+id/checkBox4"
-        android:layout_alignLeft="@+id/editText10"
-        android:layout_alignStart="@+id/editText10" />
-
-    <EditText
-        android:layout_width="60dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/edittextradius"
-        android:id="@+id/editText9"
-        android:hint= "__:__"
-        android:paddingLeft = "10dp"
-
-        android:layout_alignTop="@+id/editText8"
-        android:layout_alignLeft="@+id/editText6"
-        android:layout_alignStart="@+id/editText6" />
-
-    <EditText
-        android:layout_width="60dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/edittextradius"
-        android:hint= "__:__"
-        android:paddingLeft = "10dp"
-        android:id="@+id/editText10"
-        android:layout_alignBottom="@+id/checkBox5"
+        android:id="@+id/etFriStart"
+        android:layout_alignBottom="@+id/cbFri"
         android:layout_centerHorizontal="true" />
 
     <EditText
+        android:id="@+id/etFriFinish"
         android:layout_width="60dp"
         android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/etThuFinish"
+        android:layout_alignStart="@+id/etThuFinish"
+        android:layout_alignTop="@+id/etFriStart"
         android:background="@drawable/edittextradius"
-        android:hint= "__:__"
-        android:paddingLeft = "10dp"
-        android:id="@+id/editText11"
-        android:layout_alignTop="@+id/editText10"
-        android:layout_alignLeft="@+id/editText9"
-        android:layout_alignStart="@+id/editText9" />
+        android:hint="__:__"
+        android:paddingLeft="10dp"/>
 
     <Button
+        android:id="@+id/btnCreateCourse"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:text="Create"
-        android:id="@+id/button8"
-        android:layout_below="@+id/editText10"
+        android:layout_below="@+id/etFriStart"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="33dp"
-        android:onClick="addCourse" />
+        android:onClick="addCourse"
+        android:text="Create"/>
+
+    <EditText
+        android:id="@+id/etTotalHours"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/autoTeacher"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:ems="10"
+        android:hint="@string/total_hours"
+        android:inputType="number"/>
 
 
 </RelativeLayout>
