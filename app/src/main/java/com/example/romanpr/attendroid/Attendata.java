@@ -76,7 +76,7 @@ public class Attendata {
                     allProfessors.put(dsProfessor.getKey(),
                             professor.getFirstName() + " " + professor.getLastName());
                     if (dsProfessor.getKey().equals(userId)) {
-                        user = dsProfessor.getValue(Student.class);
+                        user = dsProfessor.getValue(Professor.class);
                     }
                 }
 
@@ -91,7 +91,7 @@ public class Attendata {
                     }
                 }
 
-                Intent intent = new Intent(context, AdminMainActivity.class);
+                Intent intent = new Intent(context, TeacherMainActivity.class);
                 intent.putExtra("USER_ID", userId);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
@@ -166,5 +166,9 @@ public class Attendata {
             }
         }
         return null;
+    }
+
+    public void storeProfessorLocation(GPSLocation location) {
+        database.child("professors/" + userId + "/location/").setValue(location);
     }
 }

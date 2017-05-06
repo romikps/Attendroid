@@ -1,7 +1,12 @@
 package com.example.romanpr.attendroid;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -41,6 +46,7 @@ public class LoginActivity extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
+                    Toast.makeText(LoginActivity.this, "You've logged in successfully!\nYour data is loading...", Toast.LENGTH_LONG).show();
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                     Attendata userData = Attendata.get(getBaseContext(), user.getUid());
                 } else {
@@ -49,7 +55,10 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         };
-        signOut();
+        // signOut();
+        if (!GPSLocation.locationAccessPermissionGranted(this)) {
+            GPSLocation.requestLocationPermissions(this);
+        }
     }
 
     // Attach the listener to your FirebaseAuth instance in the onStart() method and remove it on onStop()

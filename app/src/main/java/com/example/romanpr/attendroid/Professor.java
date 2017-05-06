@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Professor extends User {
 
-    List<String> courseIds;
+    GPSLocation location;
 
     public Professor() {
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
@@ -18,6 +18,10 @@ public class Professor extends User {
     public Professor(String firstName, String lastName,
                    String email, String faculty, String department) {
         super(firstName, lastName, email, faculty, department, Role.Professor);
-        this.courseIds = new ArrayList<>();
+        this.location = new GPSLocation(0, 0);
+    }
+
+    public GPSLocation getLocation() {
+        return location;
     }
 }

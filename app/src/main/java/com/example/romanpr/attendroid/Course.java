@@ -20,7 +20,7 @@ public class Course {
     Map<String, ClassTime> schedule;
     Map<String, Boolean> students;
     int totalHours;
-    boolean isActive;
+    boolean isActive, isTakingAttendace;
     String courseId;
 
     public Course() {}
@@ -32,6 +32,7 @@ public class Course {
         this.students = new HashMap<>();
         this.totalHours = totalHours;
         this.isActive = true;
+        this.isTakingAttendace = false;
         this.courseId = courseId;
     }
 
@@ -65,6 +66,10 @@ public class Course {
 
     public String getCourseId() {
         return courseId;
+    }
+
+    public boolean isTakingAttendace() {
+        return isTakingAttendace;
     }
 
     @Exclude

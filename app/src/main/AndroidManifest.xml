@@ -25,6 +25,8 @@
         <activity android:name=".ScheduleActivity"/>
         <activity android:name=".AdminMainActivity"/>
         <activity android:name=".AdminCourseActivity"/>
+        <activity android:name=".TeacherMainActivity"/>
+        <activity android:name=".TeacherCourseActivity"/>
     </application>
 
 </manifest>
