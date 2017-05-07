@@ -28,6 +28,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+    private static final String KEY_LAST_ATTENDANCE_TIMESTAMP = "last_attendance_timestamp";
     RecyclerView courseRecyclerView;
     CourseAdapter adapter;
     Attendata userData;
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         courseRecyclerView = (RecyclerView) findViewById(R.id.course_recycler_view);
         courseRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         attendanceBtn = (Button) findViewById(R.id.attendance_button);
+        attendanceBtn.setEnabled(false);
 
         TextView tvStudentName = (TextView) findViewById(R.id.student_name);
         TextView tvStudentNumber = (TextView) findViewById(R.id.student_number);
@@ -85,8 +87,12 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this,
                         "Submit attendance for " + course.getCourseName(), Toast.LENGTH_LONG).show();
                 attendanceProgressBar.setProgressTintList(ColorStateList.valueOf(Color.BLUE));
-                attendanceBtn.setEnabled(true);
-                attendanceBtn.setBackgroundResource(android.R.drawable.btn_default);
+                Log.d(TAG, "Current: " + getCurrentMin());
+                Log.d(TAG, "Last: " + student.getLastAttendance());
+                if (getCurrentMin() - student.getLastAttendance() >= 45) {
+                    attendanceBtn.setEnabled(true);
+                    attendanceBtn.setBackgroundResource(android.R.drawable.btn_default);
+                }
                 Attendata.get(MainActivity.this).getDatabase()
                         .child("professors/" + course.getProfessor() + "/location/")
                         .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -163,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
                 attendanceBtn.setBackgroundColor(Color.GREEN);
                 attendanceBtn.setEnabled(false);
                 userData.submitAttendance(openCourseId, student.getUserId());
+                userData.setLastAttendance(student.getUserId(), getCurrentMin());
             }
         } else {
             Toast.makeText(this, "Some location is missing :(", Toast.LENGTH_SHORT).show();
@@ -170,5 +177,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+    private long getCurrentMin() {
+        return System.currentTimeMillis() / (1000 * 60);
+    }
 }

@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class Student extends User {
 
-    long studentId;
+    long studentId, lastAttendance;
     int points;
     Map<String, Integer> attendanceData;
 
@@ -32,6 +32,10 @@ public class Student extends User {
 
     public int getPoints() {
         return points;
+    }
+
+    public long getLastAttendance() {
+        return lastAttendance;
     }
 
     public Map<String, Integer> getAttendanceData() {

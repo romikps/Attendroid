@@ -205,4 +205,8 @@ public class Attendata {
                 ((Student) user).getAttendanceData().get(courseId) + 1);
         database.updateChildren(updates);
     }
+
+    public void setLastAttendance(String userId, long mins) {
+        database.child("students/" + userId + "/lastAttendance").setValue(mins);
+    }
 }
