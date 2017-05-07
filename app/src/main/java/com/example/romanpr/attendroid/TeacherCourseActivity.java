@@ -12,22 +12,36 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class TeacherCourseActivity extends AppCompatActivity {
-    ListView lv;
-    String[] title = {"Jennifer Lawrance \n 130144040","Benedict Cumberbatch \n" +
-            " 130144040","Martin Freeman \n" +
-            " 130144040" };
+import java.util.ArrayList;
+import java.util.Collections;
 
+public class TeacherCourseActivity extends AppCompatActivity {
+
+    ListView lvStudentList;
+    Attendata data;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teacher_course);
-        this.setTitle("Teacher Course");
-
-        //ListView studentList=(ListView) findViewById(R.id.studentList);
-        lv = (ListView) findViewById(R.id.listView1);
-        CustomAdapter adapter = new CustomAdapter(this,title);
-        lv.setAdapter(adapter);
+        this.setTitle("Enrolled Students");
+        data = Attendata.get(this);
+        ListView lvStudentList = (ListView) findViewById(R.id.studentList);
+        String course_id = getIntent().getStringExtra("EXTRA_COURSE_ID");
+        for (Course course : data.getCourses()) {
+            if (course.getCourseId().equals(course_id) && course.getStudents() != null) {
+                ArrayList<String> studentList = new ArrayList<>();
+                for (String studentId : course.getStudents().keySet()) {
+                    String studentName = (course.getStudents().get(studentId) ? "+ " : "")
+                    + data.getAllStudents().get(studentId);
+                    studentList.add(studentName);
+                }
+                Collections.sort(studentList);
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                        android.R.layout.simple_list_item_1, studentList);
+                lvStudentList.setAdapter(adapter);
+                break;
+            }
+        }
 
         //ArrayAdapter dataAdaptor=ArrayAdapter.createFromResource(this, R.array.student_array,android.R.layout.simple_list_item_1);
 
@@ -71,13 +85,4 @@ public class TeacherCourseActivity extends AppCompatActivity {
         }
 
     }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.teacher_main, menu);
-        return true;
-    }
-
-
 }

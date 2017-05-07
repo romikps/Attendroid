@@ -194,4 +194,16 @@ public class Attendata {
     public void setTakingAttendance(String courseId, boolean isTakingAttendance) {
         database.child("courses/" + courseId + "/isTakingAttendance/").setValue(isTakingAttendance);
     }
+
+    public void clearClassAttendance(String courseId) {
+        Map<String, Object> updates = new HashMap<>();
+        for (Course course : courses) {
+            if (course.getCourseId().equals(courseId) && course.getStudents() != null) {
+                for (String studentId : course.getStudents().keySet()) {
+                    updates.put(studentId, false);
+                }
+            }
+        }
+        database.child("courses/" + courseId + "/students/").updateChildren(updates);
+    }
 }

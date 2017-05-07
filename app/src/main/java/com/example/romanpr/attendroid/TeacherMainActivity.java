@@ -59,7 +59,33 @@ public class TeacherMainActivity extends AppCompatActivity {
         //DATABASE
         //Spinner includes courses which are given by an instructor. Teacher's ID or full name will match
         //in the database(login part) and spinner shows courses according to the teacher.
-        count = new CountDownTimer(10000, 1000) { // adjust the milli seconds here
+        professorCourses = getProfessorCourses();
+        professorCourses.add(0, "Please choose a course");
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, professorCourses);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position > 0) {
+                    String selectedCourse = professorCourses.get(position);
+                    selectedCourseId = Attendata.getKey(profData.getAllCourses(), selectedCourse);
+                    take_attend_switch.setChecked(false);
+                    take_attend_switch.setEnabled(true);
+                    student_list.setEnabled(true);
+                } else {
+                    take_attend_switch.setChecked(false);
+                    take_attend_switch.setEnabled(false);
+                    student_list.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        count = new CountDownTimer(10000000, 1000) { // adjust the milli seconds here
 
             public void onTick(long millisUntilFinished) {
                 time_remain.setText(String.format("%d min %d sec",
@@ -96,41 +122,17 @@ public class TeacherMainActivity extends AppCompatActivity {
                     if (profLocation != null) {
                         profData.storeProfessorLocation(profLocation);
                         profData.setTakingAttendance(selectedCourseId, true);
+                        profData.clearClassAttendance(selectedCourseId);
                         count.start();
                     }
                 }
             }
         });
-
-        professorCourses = getProfessorCourses();
-        professorCourses.add(0, "Please choose a course");
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, professorCourses);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position > 0) {
-                    String selectedCourse = professorCourses.get(position);
-                    selectedCourseId = Attendata.getKey(profData.getAllCourses(), selectedCourse);
-                    take_attend_switch.setChecked(false);
-                    take_attend_switch.setEnabled(true);
-                    student_list.setEnabled(true);
-                } else {
-                    take_attend_switch.setChecked(false);
-                    take_attend_switch.setEnabled(false);
-                    student_list.setEnabled(false);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
     }
 
     public void showStudentList(View v){
         Intent intent = new Intent(this, TeacherCourseActivity.class);
+        intent.putExtra("EXTRA_COURSE_ID", selectedCourseId);
         startActivity(intent);
     }
 
