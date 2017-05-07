@@ -112,6 +112,10 @@ public class Attendata {
         });
     }
 
+    public DatabaseReference getDatabase() {
+        return database;
+    }
+
     public static void setUserId(String userId) {
         Attendata.userId = userId;
     }
@@ -140,8 +144,8 @@ public class Attendata {
         // Simultaneous
         Map<String, Object> updates = new HashMap<>();
         updates.put("students/" + studentId + "/attendanceData/" + courseId, 0);
-        updates.put("students/" + studentId + "/courses/" + courseId, true);
-        updates.put("courses/" + courseId + "/students/" + studentId, true);
+        updates.put("students/" + studentId + "/courses/" + courseId, false);
+        updates.put("courses/" + courseId + "/students/" + studentId, false);
         database.updateChildren(updates);
     }
 
@@ -192,5 +196,13 @@ public class Attendata {
             }
         }
         database.child("courses/" + courseId + "/students/").updateChildren(updates);
+    }
+
+    public void submitAttendance(String courseId, String studentId) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("courses/" + courseId + "/students/" + studentId, true);
+        updates.put("students/" + studentId + "/attendanceData/" + courseId,
+                ((Student) user).getAttendanceData().get(courseId) + 1);
+        database.updateChildren(updates);
     }
 }

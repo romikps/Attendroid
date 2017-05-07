@@ -97,4 +97,21 @@ public class GPSLocation {
                     + "\nLongitude: " + df.format(location.getLongitude()), Toast.LENGTH_LONG).show();
         return new GPSLocation(location.getLatitude(), location.getLongitude());
     }
+
+    public static double degToRad(double deg) {
+        return deg * Math.PI/180;
+    }
+
+    public static double getDistance(GPSLocation loc1, GPSLocation loc2) {
+        int R = 6371 * 1000; // Radius of the earth in m
+        double dLat = degToRad(loc2.getLatitude() - loc1.getLatitude());
+        double dLng = degToRad(loc2.getLongitude() - loc1.getLongitude());
+        double a =
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                        Math.cos(degToRad(loc1.getLatitude())) * Math.cos(degToRad(loc2.getLatitude())) *
+                                Math.sin(dLng/2) * Math.sin(dLng/2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double d = R * c; // Distance in m
+        return Math.abs(d);
+    }
 }

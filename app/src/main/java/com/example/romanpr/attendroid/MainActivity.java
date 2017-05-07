@@ -1,11 +1,9 @@
 package com.example.romanpr.attendroid;
 
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,9 +14,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
@@ -29,6 +32,10 @@ public class MainActivity extends AppCompatActivity {
     CourseAdapter adapter;
     Attendata userData;
     Student student;
+    GPSLocation profLocation;
+    Button attendanceBtn;
+    String openCourseId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         courseRecyclerView = (RecyclerView) findViewById(R.id.course_recycler_view);
         courseRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        attendanceBtn = (Button) findViewById(R.id.attendance_button);
 
         TextView tvStudentName = (TextView) findViewById(R.id.student_name);
         TextView tvStudentNumber = (TextView) findViewById(R.id.student_number);
@@ -73,9 +81,25 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, course.toString());
             if (course.getIsTakingAttendance()) {
                 Log.d(TAG, course.getCourseName() + " is taking attendance!");
+                openCourseId = course.getCourseId();
                 Toast.makeText(MainActivity.this,
                         "Submit attendance for " + course.getCourseName(), Toast.LENGTH_LONG).show();
                 attendanceProgressBar.setProgressTintList(ColorStateList.valueOf(Color.BLUE));
+                attendanceBtn.setEnabled(true);
+                attendanceBtn.setBackgroundResource(android.R.drawable.btn_default);
+                Attendata.get(MainActivity.this).getDatabase()
+                        .child("professors/" + course.getProfessor() + "/location/")
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                profLocation = dataSnapshot.getValue(GPSLocation.class);
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                Log.e(TAG, databaseError.toString());
+                            }
+                        });
             }
         }
     }
@@ -128,9 +152,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     public void onGiveAttendanceClicked(View view) {
-        GPSLocation.getLocation(this);
+        GPSLocation studentLocation = GPSLocation.getLocation(this);
+        if (studentLocation != null && profLocation != null) {
+            double distance = GPSLocation.getDistance(studentLocation, profLocation);
+            Toast.makeText(this,
+                    "Distance: " + distance,
+                    Toast.LENGTH_SHORT).show();
+            if (distance >= 0 && distance < 10 && openCourseId != null) {
+                attendanceBtn.setBackgroundColor(Color.GREEN);
+                attendanceBtn.setEnabled(false);
+                userData.submitAttendance(openCourseId, student.getUserId());
+            }
+        } else {
+            Toast.makeText(this, "Some location is missing :(", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
 
