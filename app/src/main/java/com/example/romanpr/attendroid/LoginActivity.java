@@ -49,15 +49,14 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this, "You've logged in successfully!\nYour data is loading...", Toast.LENGTH_LONG).show();
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                     Attendata.setUserId(user.getUid());
-                    Attendata.setNextActivity("TeacherMainActivity");
-                    Attendata userData = Attendata.get(LoginActivity.this);
+                    Attendata.get(LoginActivity.this);
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
             }
         };
-        // signOut();
+        signOut();
         if (!GPSLocation.locationAccessPermissionGranted(this)) {
             GPSLocation.requestLocationPermissions(this);
         }

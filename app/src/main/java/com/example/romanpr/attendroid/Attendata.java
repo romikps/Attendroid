@@ -30,8 +30,6 @@ public class Attendata {
     private Map<String, String> allStudents;
     private Map<String, String> allProfessors;
     private static String userId;
-    private static String nextActivity;
-    private Context context;
 
     public static Attendata get(Context context) {
         if (data == null) {
@@ -41,7 +39,6 @@ public class Attendata {
     }
 
     private Attendata(final Context context) {
-        this.context = context;
         database = FirebaseDatabase.getInstance().getReference();
         database.addValueEventListener(new ValueEventListener() {
             @Override
@@ -92,24 +89,18 @@ public class Attendata {
                 //TeacherMainActivity.class
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 boolean start = true;
-                switch (nextActivity) {
-                    case "MainActivity":
+                switch (Role.valueOf(user.getRole())) {
+                    case Student:
                         intent.setClass(context, MainActivity.class);
                         break;
-                    case "TeacherMainActivity":
+                    case Professor:
                         intent.setClass(context, TeacherMainActivity.class);
                         break;
-                    case "AdminMainActivity":
+                    case Admin:
                         intent.setClass(context, AdminMainActivity.class);
                         break;
-                    default:
-                        start = false;
                 }
-
-                if (start) {
-                    setNextActivity("");
-                    context.startActivity(intent);
-                }
+                context.startActivity(intent);
             }
 
             @Override
@@ -123,10 +114,6 @@ public class Attendata {
 
     public static void setUserId(String userId) {
         Attendata.userId = userId;
-    }
-
-    public static void setNextActivity(String nextActivity) {
-        Attendata.nextActivity = nextActivity;
     }
 
     public User getUser() {

@@ -2,11 +2,14 @@ package com.example.romanpr.attendroid;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -67,6 +70,13 @@ public class MainActivity extends AppCompatActivity {
             tvAttendanceStatus.setText(hoursAttended + "/" + course.getTotalHours());
             attendanceProgressBar.setMax(course.getTotalHours());
             attendanceProgressBar.setProgress(hoursAttended);
+            Log.d(TAG, course.toString());
+            if (course.getIsTakingAttendance()) {
+                Log.d(TAG, course.getCourseName() + " is taking attendance!");
+                Toast.makeText(MainActivity.this,
+                        "Submit attendance for " + course.getCourseName(), Toast.LENGTH_LONG).show();
+                attendanceProgressBar.setProgressTintList(ColorStateList.valueOf(Color.BLUE));
+            }
         }
     }
 

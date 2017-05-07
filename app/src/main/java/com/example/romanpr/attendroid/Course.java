@@ -20,7 +20,7 @@ public class Course {
     Map<String, ClassTime> schedule;
     Map<String, Boolean> students;
     int totalHours;
-    boolean isActive, isTakingAttendace;
+    boolean isActive, isTakingAttendance;
     String courseId;
 
     public Course() {}
@@ -32,7 +32,7 @@ public class Course {
         this.students = new HashMap<>();
         this.totalHours = totalHours;
         this.isActive = true;
-        this.isTakingAttendace = false;
+        this.isTakingAttendance = false;
         this.courseId = courseId;
     }
 
@@ -52,7 +52,7 @@ public class Course {
         return students;
     }
 
-    public boolean isActive() {
+    public boolean getIsActive() {
         return isActive;
     }
 
@@ -68,8 +68,8 @@ public class Course {
         return courseId;
     }
 
-    public boolean isTakingAttendace() {
-        return isTakingAttendace;
+    public boolean getIsTakingAttendance() {
+        return isTakingAttendance;
     }
 
     @Exclude
@@ -82,5 +82,17 @@ public class Course {
             strClassHours += time.toString() + "\n";
         }
         return strClassHours.trim();
+    }
+
+    @Override
+    public String toString() {
+        return "Course {" +
+                "courseName='" + courseName + '\'' +
+                ", professor='" + professor + '\'' +
+                ", totalHours=" + totalHours +
+                ", isActive=" + isActive +
+                ", isTakingAttendance=" + isTakingAttendance +
+                ", courseId='" + courseId + '\'' +
+                '}';
     }
 }

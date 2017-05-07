@@ -44,21 +44,13 @@ public class RegisterActivity extends Activity {
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in: " + user.getUid());
+                    Toast.makeText(RegisterActivity.this, "You've successfully registered and logged in!\nYour data is loading...", Toast.LENGTH_LONG).show();
                     newUser.setUserId(user.getUid());
                     database = FirebaseDatabase.getInstance().getReference();
                     database.child(newUser.getRole().toLowerCase() + "s").child(user.getUid()).setValue(newUser);
                     Attendata.setUserId(user.getUid());
-                    switch (Role.valueOf(newUser.getRole())) {
-                        case Student:
-                            Attendata userData = Attendata.get(getBaseContext());
-                            break;
-                        case Professor:
-                            Toast.makeText(getBaseContext(), "Good day, Professor!", Toast.LENGTH_SHORT);
-                            break;
-                        case Admin:
-                            Toast.makeText(getBaseContext(), "Good day, Mr. Administrator!", Toast.LENGTH_SHORT);
-                            break;
-                    }
+                    Attendata.get(getBaseContext());
+
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
