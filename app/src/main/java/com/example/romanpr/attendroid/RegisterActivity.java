@@ -47,9 +47,10 @@ public class RegisterActivity extends Activity {
                     newUser.setUserId(user.getUid());
                     database = FirebaseDatabase.getInstance().getReference();
                     database.child(newUser.getRole().toLowerCase() + "s").child(user.getUid()).setValue(newUser);
+                    Attendata.setUserId(user.getUid());
                     switch (Role.valueOf(newUser.getRole())) {
                         case Student:
-                            Attendata userData = Attendata.get(getBaseContext(), user.getUid());
+                            Attendata userData = Attendata.get(getBaseContext());
                             break;
                         case Professor:
                             Toast.makeText(getBaseContext(), "Good day, Professor!", Toast.LENGTH_SHORT);

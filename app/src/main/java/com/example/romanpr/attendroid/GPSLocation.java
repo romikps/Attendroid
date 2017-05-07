@@ -24,6 +24,8 @@ public class GPSLocation {
     private static final int LOCATION_ACCESS_PERMISSION_REQUEST = 1;
     double latitude, longitude;
 
+    public GPSLocation() {}
+
     public GPSLocation(double latitude, double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
@@ -86,6 +88,7 @@ public class GPSLocation {
 
         if (ActivityCompat.checkSelfPermission(thisActivity, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(thisActivity, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(thisActivity, "No Location Access Permission!", Toast.LENGTH_SHORT).show();
             return null;
         }
         Location location = locationManager.getLastKnownLocation(provider);

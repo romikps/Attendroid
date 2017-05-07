@@ -20,31 +20,28 @@ import java.util.Map;
  */
 
 public class Attendata {
+
     private static final String TAG = "Attendata";
     private static Attendata data;
-
     private DatabaseReference database;
-
-    private String userId;
     private User user;
     private List<Course> courses;
     private Map<String, String> allCourses;
     private Map<String, String> allStudents;
     private Map<String, String> allProfessors;
+    private static String userId;
+    private static String nextActivity;
+    private Context context;
 
-
-    public static Attendata get(Context context, String userId) {
+    public static Attendata get(Context context) {
         if (data == null) {
-            data = new Attendata(context, userId);
+            data = new Attendata(context);
         }
         return data;
     }
 
-    public static Attendata get(Context context) {
-        return data;
-    }
-
-    private Attendata(final Context context, final String userId) {
+    private Attendata(final Context context) {
+        this.context = context;
         database = FirebaseDatabase.getInstance().getReference();
         database.addValueEventListener(new ValueEventListener() {
             @Override
@@ -91,10 +88,28 @@ public class Attendata {
                     }
                 }
 
-                Intent intent = new Intent(context, TeacherMainActivity.class);
-                intent.putExtra("USER_ID", userId);
+                Intent intent = new Intent();
+                //TeacherMainActivity.class
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
+                boolean start = true;
+                switch (nextActivity) {
+                    case "MainActivity":
+                        intent.setClass(context, MainActivity.class);
+                        break;
+                    case "TeacherMainActivity":
+                        intent.setClass(context, TeacherMainActivity.class);
+                        break;
+                    case "AdminMainActivity":
+                        intent.setClass(context, AdminMainActivity.class);
+                        break;
+                    default:
+                        start = false;
+                }
+
+                if (start) {
+                    setNextActivity("");
+                    context.startActivity(intent);
+                }
             }
 
             @Override
@@ -106,8 +121,12 @@ public class Attendata {
         });
     }
 
-    public String getUserId() {
-        return userId;
+    public static void setUserId(String userId) {
+        Attendata.userId = userId;
+    }
+
+    public static void setNextActivity(String nextActivity) {
+        Attendata.nextActivity = nextActivity;
     }
 
     public User getUser() {
@@ -170,5 +189,9 @@ public class Attendata {
 
     public void storeProfessorLocation(GPSLocation location) {
         database.child("professors/" + userId + "/location/").setValue(location);
+    }
+
+    public void setTakingAttendance(String courseId, boolean isTakingAttendance) {
+        database.child("courses/" + courseId + "/isTakingAttendance/").setValue(isTakingAttendance);
     }
 }

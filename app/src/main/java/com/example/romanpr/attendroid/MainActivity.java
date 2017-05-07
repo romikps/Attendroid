@@ -32,8 +32,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String userId = getIntent().getStringExtra("USER_ID");
-        userData = Attendata.get(this, userId);
+        userData = Attendata.get(this);
         student = (Student) userData.getUser();
 
         courseRecyclerView = (RecyclerView) findViewById(R.id.course_recycler_view);
