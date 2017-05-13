@@ -1,9 +1,13 @@
 package com.example.romanpr.attendroid;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -13,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,6 +38,7 @@ public class LocationActivity extends AppCompatActivity {
     DatabaseReference database;
     List<LocationInfo> locations;
     LocationListAdapter adapter;
+    ChildEventListener locationListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,14 +46,14 @@ public class LocationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_location);
         userId = getIntent().getStringExtra("USER_ID");
         locations = new ArrayList<>();
-        database = FirebaseDatabase.getInstance().getReference();
+        database = FirebaseDatabase.getInstance().getReference("locations/" + userId);
         currentActivity = (EditText) findViewById(R.id.current_activity_edit_text);
         provideLocation= (Button) findViewById(R.id.provide_location_button);
         userLocations = (ListView) findViewById(R.id.user_locations_list_view);
         adapter = new LocationListAdapter(this, locations);
         userLocations.setAdapter(adapter);
 
-        database.child("locations/" + userId).addValueEventListener(new ValueEventListener() {
+        /*database.child("locations/" + userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 locations.clear();
@@ -68,7 +74,7 @@ public class LocationActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        });*/
     }
 
     public void onGiveMyLocationClicked(View view) {
@@ -85,7 +91,7 @@ public class LocationActivity extends AppCompatActivity {
     }
 
     public void storeUserLocationInfo(LocationInfo location) {
-        database.child("locations/" + userId).push().setValue(location);
+        database.push().setValue(location);
     }
 
     public long getTimestamp() {
@@ -119,4 +125,65 @@ public class LocationActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        locationListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                locations.add(0, dataSnapshot.getValue(LocationInfo.class));
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        database.addChildEventListener(locationListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (locationListener != null) {
+            database.removeEventListener(locationListener);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.location_activity_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.show_map_menu_item:
+                Intent intent = new Intent(this, MapLocationActivity.class);
+                intent.putExtra("USER_ID", userId);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }

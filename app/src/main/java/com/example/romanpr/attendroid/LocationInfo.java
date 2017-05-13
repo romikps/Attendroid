@@ -32,4 +32,13 @@ public class LocationInfo {
     public String getActivity() {
         return activity;
     }
+
+    @Override
+    public String toString() {
+        return "LocationInfo {" +
+                "location=" + location +
+                ", timestamp=" + timestamp +
+                ", activity='" + activity + '\'' +
+                '}';
+    }
 }
