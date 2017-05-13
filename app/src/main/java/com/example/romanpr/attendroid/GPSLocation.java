@@ -92,10 +92,15 @@ public class GPSLocation {
             return null;
         }
         Location location = locationManager.getLastKnownLocation(provider);
-        DecimalFormat df = new DecimalFormat("#.##");
-        Toast.makeText(thisActivity, "Latitude: " + df.format(location.getLatitude())
+        if (location != null) {
+            DecimalFormat df = new DecimalFormat("#.##");
+            Toast.makeText(thisActivity, "Latitude: " + df.format(location.getLatitude())
                     + "\nLongitude: " + df.format(location.getLongitude()), Toast.LENGTH_LONG).show();
-        return new GPSLocation(location.getLatitude(), location.getLongitude());
+            return new GPSLocation(location.getLatitude(), location.getLongitude());
+        } else {
+            Toast.makeText(thisActivity, "Your location is null", Toast.LENGTH_SHORT).show();
+            return null;
+        }
     }
 
     public static double degToRad(double deg) {
