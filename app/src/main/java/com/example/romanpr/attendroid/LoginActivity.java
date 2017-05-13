@@ -60,7 +60,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         };
-        // signOut();
+        signOut();
         if (!GPSLocation.locationAccessPermissionGranted(this)) {
             GPSLocation.requestLocationPermissions(this);
         }
