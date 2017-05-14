@@ -89,6 +89,7 @@ public class GPSLocation {
         if (ActivityCompat.checkSelfPermission(thisActivity, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(thisActivity, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(thisActivity, "No Location Access Permission!", Toast.LENGTH_SHORT).show();
+            GPSLocation.requestCoarseFineLocation(thisActivity);
             return null;
         }
         Location location = locationManager.getLastKnownLocation(provider);

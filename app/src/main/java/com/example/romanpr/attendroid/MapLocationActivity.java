@@ -1,5 +1,6 @@
 package com.example.romanpr.attendroid;
 
+import android.Manifest;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,7 +23,8 @@ import com.google.firebase.database.ValueEventListener;
 public class MapLocationActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final String TAG = "MapLocationActivity";
-    GoogleMap googleMap;
+    
+    private GoogleMap mMap;
     MapFragment mapFragment;
     DatabaseReference database;
     String userId;
@@ -40,7 +42,7 @@ public class MapLocationActivity extends AppCompatActivity implements OnMapReady
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        googleMap = googleMap;
+        mMap = googleMap;
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         try {
             googleMap.setMyLocationEnabled(true);
@@ -53,7 +55,6 @@ public class MapLocationActivity extends AppCompatActivity implements OnMapReady
         googleMap.setBuildingsEnabled(true);
         googleMap.getUiSettings().setZoomControlsEnabled(true);
 
-        final GoogleMap finalGoogleMap = googleMap;
         database.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -65,14 +66,14 @@ public class MapLocationActivity extends AppCompatActivity implements OnMapReady
                     placeLocation = new LatLng(locInfo.getLocation().getLatitude(),
                             locInfo.getLocation().getLongitude());
                     bld.include(placeLocation);
-                    Marker placeMarker = finalGoogleMap.addMarker(new MarkerOptions().position(placeLocation)
+                    Marker placeMarker = mMap.addMarker(new MarkerOptions().position(placeLocation)
                             .title(locInfo.getActivity()));
                     // finalGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(placeLocation));
                     // finalGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(10), 1000, null);
                 }
                 LatLngBounds bounds = bld.build();
                 // finalGoogleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 70));
-                finalGoogleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150));
                 // finalGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeLocation, 16.0f));
             }
 
