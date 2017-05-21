@@ -48,12 +48,12 @@ public class LoginActivity extends AppCompatActivity {
                     // User is signed in
                     Toast.makeText(LoginActivity.this, "You've logged in successfully!\nYour data is loading...", Toast.LENGTH_LONG).show();
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    Intent intent = new Intent(LoginActivity.this, LocationActivity.class);
+                    /*Intent intent = new Intent(LoginActivity.this, LocationActivity.class);
                     intent.putExtra("USER_ID", user.getUid());
-                    startActivity(intent);
+                    startActivity(intent);*/
 
-                    // Attendata.setUserId(user.getUid());
-                    // Attendata.get(LoginActivity.this);
+                     Attendata.setUserId(user.getUid());
+                     Attendata.get(LoginActivity.this);
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");

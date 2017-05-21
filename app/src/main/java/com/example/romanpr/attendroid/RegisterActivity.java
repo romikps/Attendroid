@@ -48,11 +48,11 @@ public class RegisterActivity extends Activity {
                     newUser.setUserId(user.getUid());
                     database = FirebaseDatabase.getInstance().getReference();
                     database.child(newUser.getRole().toLowerCase() + "s").child(user.getUid()).setValue(newUser);
-                    /*Attendata.setUserId(user.getUid());
-                    Attendata.get(getBaseContext());*/
-                    Intent intent = new Intent(RegisterActivity.this, LocationActivity.class);
+                    Attendata.setUserId(user.getUid());
+                    Attendata.get(getBaseContext());
+                   /* Intent intent = new Intent(RegisterActivity.this, LocationActivity.class);
                     intent.putExtra("USER_ID", user.getUid());
-                    startActivity(intent);
+                    startActivity(intent);*/
 
                 } else {
                     // User is signed out

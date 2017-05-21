@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -150,5 +151,21 @@ public class TeacherMainActivity extends AppCompatActivity {
             professorCourses.add(course.getCourseName());
         }
         return professorCourses;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
+        switch (item.getItemId()) {
+            case R.id.menu_item_show_schedule:
+                return true;
+            case R.id.menu_item_show_map_activity:
+                intent = new Intent(this, LocationActivity.class);
+                intent.putExtra("USER_ID", professor.getUserId());
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }

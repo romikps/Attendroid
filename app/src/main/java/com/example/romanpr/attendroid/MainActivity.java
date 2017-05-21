@@ -3,7 +3,9 @@ package com.example.romanpr.attendroid;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -74,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
             attendanceProgressBar = (ProgressBar) itemView.findViewById(R.id.attendance_progress_bar);
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         public void bindCourse(Course course) {
             int hoursAttended = student.getAttendanceData().get(course.getCourseId());
             tvCourseName.setText(course.getCourseName());
@@ -146,12 +149,18 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
         switch (item.getItemId()) {
             case R.id.menu_item_show_schedule:
-                Intent intent = new Intent(this, ScheduleActivity.class);
+                intent = new Intent(this, ScheduleActivity.class);
                 startActivity(intent);
                 return true;
             case R.id.menu_item_show_leader_board:
+                return true;
+            case R.id.menu_item_show_map_activity:
+                intent = new Intent(MainActivity.this, LocationActivity.class);
+                intent.putExtra("USER_ID", student.getUserId());
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
