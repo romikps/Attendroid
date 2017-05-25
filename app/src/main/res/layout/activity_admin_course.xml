@@ -26,7 +26,6 @@
         android:layout_below="@+id/tvTitle"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="20dp"
-        android:background="@drawable/edittextradius"
         android:ems="10"
         android:hint="Course Name"
         android:paddingLeft="10dp"/>

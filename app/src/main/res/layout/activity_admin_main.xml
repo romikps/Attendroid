@@ -27,10 +27,10 @@
         android:text="Add"
         android:id="@+id/add_button"
         android:onClick="addLectureToStudent"
-        android:layout_marginTop="98dp"
-        android:layout_below="@+id/tvStudentName"
-        android:layout_alignLeft="@+id/tvStudentName"
-        android:layout_alignStart="@+id/tvStudentName" />
+        android:layout_marginEnd="11dp"
+        android:layout_marginBottom="79dp"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/remove_button"/>
 
     <Button
         android:layout_width="150dp"
@@ -38,9 +38,10 @@
         android:text="Remove"
         android:id="@+id/remove_button"
         android:onClick="removeLectureStudent"
-        android:layout_alignTop="@+id/add_button"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_marginEnd="19dp"
+        android:layout_alignBaseline="@+id/add_button"
+        android:layout_alignBottom="@+id/add_button"
+        android:layout_alignParentEnd="true"/>
 
     <AutoCompleteTextView
         android:id="@+id/tvCourseName"
@@ -51,17 +52,15 @@
         android:layout_below="@+id/textView"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="66dp"
-        android:background="@drawable/edittextradius"
-        android:hint="Course Autocomplete"
+        android:hint="Course Name"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"/>
 
     <AutoCompleteTextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:hint="Student Autocomplete"
+        android:hint="Student Name"
         android:id="@+id/tvStudentName"
-        android:background="@drawable/edittextradius"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
         android:layout_below="@+id/textView"
