@@ -34,6 +34,7 @@ public class Attendata {
     // private static String userId;
     private String userId;
     private FirebaseAuth mAuth;
+    private boolean start;
 
     public static Attendata get(Context context) {
         Log.d(TAG, "Inside Attendata");
@@ -47,6 +48,7 @@ public class Attendata {
     private Attendata(final Context context) {
         database = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
+        start = true;
         database.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -93,22 +95,25 @@ public class Attendata {
                     }
                 }
 
-                Intent intent = new Intent();
-                //TeacherMainActivity.class
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                boolean start = true;
-                switch (Role.valueOf(user.getRole())) {
-                    case Student:
-                        intent.setClass(context, MainActivity.class);
-                        break;
-                    case Professor:
-                        intent.setClass(context, TeacherMainActivity.class);
-                        break;
-                    case Admin:
-                        intent.setClass(context, AdminMainActivity.class);
-                        break;
-                }
-                context.startActivity(intent);
+
+                    if (start) {
+                        Intent intent = new Intent();
+                        //TeacherMainActivity.class
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        start = false;
+                        switch (Role.valueOf(user.getRole())) {
+                            case Student:
+                                intent.setClass(context, MainActivity.class);
+                                break;
+                            case Professor:
+                                intent.setClass(context, TeacherMainActivity.class);
+                                break;
+                            case Admin:
+                                intent.setClass(context, AdminMainActivity.class);
+                                break;
+                        }
+                        context.startActivity(intent);
+                    }
             }
 
             @Override

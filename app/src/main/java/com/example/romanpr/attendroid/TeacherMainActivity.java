@@ -86,7 +86,7 @@ public class TeacherMainActivity extends AppCompatActivity {
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        count = new CountDownTimer(10000000, 1000) { // adjust the milli seconds here
+        count = new CountDownTimer(5 * 60 * 1000, 1000) { // adjust the milli seconds here
 
             public void onTick(long millisUntilFinished) {
                 time_remain.setText(String.format("%d min %d sec",
@@ -100,6 +100,7 @@ public class TeacherMainActivity extends AppCompatActivity {
                 take_attend_switch.setEnabled(false);
                 profData.storeProfessorLocation(new GPSLocation(0, 0));
                 profData.setTakingAttendance(selectedCourseId, false);
+                spinner.setEnabled(true);
             }
         };
 
@@ -124,6 +125,7 @@ public class TeacherMainActivity extends AppCompatActivity {
                         profData.storeProfessorLocation(profLocation);
                         profData.setTakingAttendance(selectedCourseId, true);
                         profData.clearClassAttendance(selectedCourseId);
+                        spinner.setEnabled(false);
                         count.start();
                     }
                 }

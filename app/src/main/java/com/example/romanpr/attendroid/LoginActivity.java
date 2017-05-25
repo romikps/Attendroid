@@ -75,6 +75,13 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        signOut();
+        Attendata.get(this).clearAttendata();
+        super.onResume();
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
         if (mAuthListener != null) {
