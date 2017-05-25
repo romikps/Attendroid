@@ -152,6 +152,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent;
         switch (item.getItemId()) {
             case R.id.menu_item_show_schedule:
+                Log.d(TAG, "Show schedule from student");
                 intent = new Intent(this, ScheduleActivity.class);
                 startActivity(intent);
                 return true;
