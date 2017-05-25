@@ -23,6 +23,8 @@ import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
@@ -38,6 +40,11 @@ public class MainActivity extends AppCompatActivity {
     GPSLocation profLocation;
     Button attendanceBtn;
     String openCourseId;
+    DatabaseReference database;
+    ValueEventListener listener;
+    TextView tvStudentName;
+    TextView tvStudentNumber;
+    TextView tvTotalPoints;
 
 
     @Override
@@ -47,22 +54,29 @@ public class MainActivity extends AppCompatActivity {
 
         userData = Attendata.get(this);
         student = (Student) userData.getUser();
+        database = FirebaseDatabase.getInstance().getReference("students/" + student.getUserId());
+        listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                student = dataSnapshot.getValue(Student.class);
+                updateStudent();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        database.addValueEventListener(listener);
 
         courseRecyclerView = (RecyclerView) findViewById(R.id.course_recycler_view);
         courseRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         attendanceBtn = (Button) findViewById(R.id.attendance_button);
         attendanceBtn.setEnabled(false);
 
-        TextView tvStudentName = (TextView) findViewById(R.id.student_name);
-        TextView tvStudentNumber = (TextView) findViewById(R.id.student_number);
-        TextView tvTotalPoints = (TextView) findViewById(R.id.total_points);
-        tvStudentName.setText(student.getFirstName() + " " + student.getLastName());
-        tvStudentNumber.setText(Long.toString(student.getStudentId()));
-        String points = getString(R.string.points_format, student.getPoints());
-        tvTotalPoints.setText(points);
-
-        adapter = new CourseAdapter(userData.getCourses());
-        courseRecyclerView.setAdapter(adapter);
+        tvStudentName = (TextView) findViewById(R.id.student_name);
+        tvStudentNumber = (TextView) findViewById(R.id.student_number);
+        tvTotalPoints = (TextView) findViewById(R.id.total_points);
     }
 
     private class CourseHolder extends RecyclerView.ViewHolder {
@@ -111,6 +125,15 @@ public class MainActivity extends AppCompatActivity {
                         });
             }
         }
+    }
+
+    public void updateStudent() {
+        tvStudentName.setText(student.getFirstName() + " " + student.getLastName());
+        tvStudentNumber.setText(Long.toString(student.getStudentId()));
+        String points = getString(R.string.points_format, student.getPoints());
+        tvTotalPoints.setText(points);
+        adapter = new CourseAdapter(userData.getCourses());
+        courseRecyclerView.setAdapter(adapter);
     }
 
     private class CourseAdapter extends RecyclerView.Adapter<CourseHolder> {

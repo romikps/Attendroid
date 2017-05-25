@@ -76,6 +76,7 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        Log.d(TAG, "Signed out on resume");
         signOut();
         Attendata.get(this).clearAttendata();
         super.onResume();

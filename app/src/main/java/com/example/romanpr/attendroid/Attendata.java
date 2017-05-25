@@ -52,6 +52,7 @@ public class Attendata {
         database.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "Data changed");
                 courses = new ArrayList<>();
                 allCourses = new HashMap<>();
                 allStudents = new HashMap<>();
