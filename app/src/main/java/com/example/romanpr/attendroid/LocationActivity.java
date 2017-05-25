@@ -254,6 +254,11 @@ public class LocationActivity extends AppCompatActivity {
                 intent.putExtra("USER_ID", userId);
                 startActivity(intent);
                 return true;
+            case R.id.log_out_menu_item:
+                Attendata.get(this).signOut();
+                intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

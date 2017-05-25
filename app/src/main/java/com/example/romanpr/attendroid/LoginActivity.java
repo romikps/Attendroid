@@ -52,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
                     intent.putExtra("USER_ID", user.getUid());
                     startActivity(intent);*/
 
-                     Attendata.setUserId(user.getUid());
+                     // Attendata.setUserId(user.getUid());
                      Attendata.get(LoginActivity.this);
                 } else {
                     // User is signed out

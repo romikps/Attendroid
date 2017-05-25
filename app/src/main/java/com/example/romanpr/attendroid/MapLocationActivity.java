@@ -200,6 +200,11 @@ public class MapLocationActivity extends AppCompatActivity implements OnMapReady
                     }
                 });
                 return true;
+            case R.id.log_out_menu_item:
+                Attendata.get(this).signOut();
+                Intent intent = new Intent(this, LoginActivity.class);
+                startActivity(intent);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

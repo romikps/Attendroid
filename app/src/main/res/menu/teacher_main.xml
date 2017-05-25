@@ -11,4 +11,9 @@
         android:icon="@drawable/ic_show_map"
         android:title="Show Map"
         app:showAsAction="ifRoom|withText"/>
+    <item
+        android:id="@+id/log_out_menu_item"
+        android:icon="@drawable/ic_log_out"
+        android:title="Log out"
+        app:showAsAction="ifRoom|withText" />
 </menu>

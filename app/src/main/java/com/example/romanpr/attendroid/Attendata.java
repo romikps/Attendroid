@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,10 +31,14 @@ public class Attendata {
     private Map<String, String> allCourses;
     private Map<String, String> allStudents;
     private Map<String, String> allProfessors;
-    private static String userId;
+    // private static String userId;
+    private String userId;
+    private FirebaseAuth mAuth;
 
     public static Attendata get(Context context) {
+        Log.d(TAG, "Inside Attendata");
         if (data == null) {
+            Log.d(TAG, "Creating new Attendata");
             data = new Attendata(context);
         }
         return data;
@@ -40,6 +46,7 @@ public class Attendata {
 
     private Attendata(final Context context) {
         database = FirebaseDatabase.getInstance().getReference();
+        mAuth = FirebaseAuth.getInstance();
         database.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -47,6 +54,7 @@ public class Attendata {
                 allCourses = new HashMap<>();
                 allStudents = new HashMap<>();
                 allProfessors = new HashMap<>();
+                userId = mAuth.getCurrentUser().getUid();
 
                 DataSnapshot dsStudents = dataSnapshot.child("students");
                 DataSnapshot dsCourses = dataSnapshot.child("courses");
@@ -116,9 +124,9 @@ public class Attendata {
         return database;
     }
 
-    public static void setUserId(String userId) {
+    /*public static void setUserId(String userId) {
         Attendata.userId = userId;
-    }
+    }*/
 
     public User getUser() {
         return user;
@@ -208,5 +216,20 @@ public class Attendata {
 
     public void setLastAttendance(String userId, long mins) {
         database.child("students/" + userId + "/lastAttendance").setValue(mins);
+    }
+
+    public void signOut() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            clearAttendata();
+            mAuth.signOut();
+            Log.d(TAG, "Signed out: " + currentUser.getUid());
+        } else {
+            Log.d(TAG, "No one to sign out");
+        }
+    }
+
+    public void clearAttendata() {
+        this.data = null;
     }
 }
