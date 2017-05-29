@@ -19,6 +19,7 @@ public class AdminCourseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_course);
+        setTitle("Create New Course");
 
         ArrayList<String> allProfessors = new ArrayList<>();
         allProfessors.addAll(Attendata.get(this).getAllProfessors().values());
@@ -76,5 +77,6 @@ public class AdminCourseActivity extends AppCompatActivity {
                 tvProfessor.getText().toString());
         int totalHours = Integer.parseInt(((EditText) findViewById(R.id.etTotalHours)).getText().toString());
         Attendata.get(this).createCourse(courseName, selectedProfessorId, totalHours, classTimes);
+        Toast.makeText(this, courseName + " successfully created", Toast.LENGTH_SHORT).show();
     }
 }

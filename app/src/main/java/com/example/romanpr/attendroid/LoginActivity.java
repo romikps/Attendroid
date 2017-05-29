@@ -36,6 +36,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        setTitle("Log In");
 
         // Setting up authentication
         mAuth = FirebaseAuth.getInstance();
@@ -48,12 +49,12 @@ public class LoginActivity extends AppCompatActivity {
                     // User is signed in
                     Toast.makeText(LoginActivity.this, "You've logged in successfully!\nYour data is loading...", Toast.LENGTH_LONG).show();
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    /*Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                     intent.putExtra("USER_ID", user.getUid());
-                    startActivity(intent);
+                    startActivity(intent);*/
 
                      // Attendata.setUserId(user.getUid());
-                     // Attendata.get(LoginActivity.this);
+                     Attendata.get(LoginActivity.this);
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");

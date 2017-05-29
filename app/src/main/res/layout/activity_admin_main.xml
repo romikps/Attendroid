@@ -20,28 +20,29 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="47dp" />
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="false"
+        android:layout_below="@+id/tvStudentName"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="false"
+        android:layout_marginTop="50dp">
 
-    <Button
-        android:layout_width="150dp"
-        android:layout_height="50dp"
-        android:text="Add"
-        android:id="@+id/add_button"
-        android:onClick="addLectureToStudent"
-        android:layout_marginEnd="11dp"
-        android:layout_marginBottom="79dp"
-        android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/remove_button"/>
+        <Button
+            android:id="@+id/add_button"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:onClick="addLectureToStudent"
+            android:text="Add"/>
 
-    <Button
-        android:layout_width="150dp"
-        android:layout_height="50dp"
-        android:text="Remove"
-        android:id="@+id/remove_button"
-        android:onClick="removeLectureStudent"
-        android:layout_marginEnd="19dp"
-        android:layout_alignBaseline="@+id/add_button"
-        android:layout_alignBottom="@+id/add_button"
-        android:layout_alignParentEnd="true"/>
+        <Button
+            android:id="@+id/remove_button"
+            android:layout_width="150dp"
+            android:layout_height="50dp"
+            android:onClick="removeLectureStudent"
+            android:text="Remove"/>
+    </LinearLayout>
 
     <AutoCompleteTextView
         android:id="@+id/tvCourseName"

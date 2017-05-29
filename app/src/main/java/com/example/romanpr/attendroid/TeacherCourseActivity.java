@@ -23,6 +23,7 @@ public class TeacherCourseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teacher_course);
+        setTitle("Attendance List");
         this.setTitle("Enrolled Students");
         data = Attendata.get(this);
         ListView lvStudentList = (ListView) findViewById(R.id.studentList);

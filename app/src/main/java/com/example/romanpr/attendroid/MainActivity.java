@@ -61,12 +61,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     TextView tvTotalPoints;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
-    Map<String, Course> mStudentCourses;
+    List<Course> mStudentCourses;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setTitle("Student Dashboard");
 
         mStudentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         database = FirebaseDatabase.getInstance().getReference();
@@ -75,6 +77,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mStudent = dataSnapshot.getValue(Student.class);
                 updateStudent();
+                synchronized(mAdapter){
+                    mAdapter.notifyDataSetChanged();
+                }
             }
 
             @Override
@@ -87,21 +92,34 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (mStudent.getCourses().keySet().contains(dataSnapshot.getKey())) {
-                    mStudentCourses.put(dataSnapshot.getKey(), dataSnapshot.getValue(Course.class));
+                    mStudentCourses.add(dataSnapshot.getValue(Course.class));
+                    mAdapter.notifyItemInserted(mStudentCourses.size() - 1);
                 }
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 if (mStudent.getCourses().keySet().contains(dataSnapshot.getKey())) {
-                    mStudentCourses.remove(dataSnapshot.getKey());
-                    mStudentCourses.put(dataSnapshot.getKey(), dataSnapshot.getValue(Course.class));
+                    for (int i = 0; i < mStudentCourses.size(); i++) {
+                        if (mStudentCourses.get(i).getCourseId().equals(dataSnapshot.getKey())) {
+                            mStudentCourses.remove(i);
+                            mStudentCourses.add(dataSnapshot.getValue(Course.class));
+                            mAdapter.notifyItemChanged(i);
+                        }
+                    }
                 }
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                if (mStudent.getCourses().keySet().contains(dataSnapshot.getKey())) {
+                    for (int i = 0; i < mStudentCourses.size(); i++) {
+                        if (mStudentCourses.get(i).getCourseId().equals(dataSnapshot.getKey())) {
+                            mStudentCourses.remove(i);
+                            mAdapter.notifyItemRemoved(i);
+                        }
+                    }
+                }
             }
 
             @Override
@@ -133,7 +151,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     .build();
         }
 
-        mStudentCourses = new HashMap<>();
+        mStudentCourses = new ArrayList<>();
+        mAdapter = new CourseAdapter(mStudentCourses);
+        mCourseRecyclerView.setAdapter(mAdapter);
     }
 
     @Override
@@ -150,6 +170,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         database.child("students/" + mStudentId).removeEventListener(mStudentListener);
         database.child("courses").removeEventListener(mCourseListener);
         super.onStop();
+    }
+
+    @Override
+    protected void onResume() {
+        mStudentCourses.clear();
+        super.onResume();
     }
 
     public void updateLocation() {
@@ -226,12 +252,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public void updateStudent() {
         tvStudentName.setText(mStudent.getFirstName() + " " + mStudent.getLastName());
         tvStudentNumber.setText(Long.toString(mStudent.getStudentId()));
-        String points = getString(R.string.points_format, mStudent.getPoints());
-        tvTotalPoints.setText(points);
-        List<Course> courses = new ArrayList<>();
-        courses.addAll(mStudentCourses.values());
-        mAdapter = new CourseAdapter(courses);
-        mCourseRecyclerView.setAdapter(mAdapter);
+        int points = 0;
+        for (int hoursAttended : mStudent.getAttendanceData().values()) {
+            points += hoursAttended * 3;
+        }
+        tvTotalPoints.setText(getString(R.string.points_format, points));
     }
 
     private class CourseAdapter extends RecyclerView.Adapter<CourseHolder> {
@@ -326,4 +351,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     public long getTime() {
         return System.currentTimeMillis() / (1000 * 60);
     }
+
+
 }

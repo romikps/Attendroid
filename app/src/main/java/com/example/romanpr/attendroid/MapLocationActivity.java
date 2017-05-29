@@ -47,6 +47,7 @@ public class MapLocationActivity extends AppCompatActivity implements OnMapReady
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_location);
+        setTitle("Student Locations");
         userId = getIntent().getStringExtra("USER_ID");
         database = FirebaseDatabase.getInstance().getReference();
         mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);

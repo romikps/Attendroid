@@ -9,17 +9,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class AdminMainActivity extends AppCompatActivity {
     AutoCompleteTextView autoStudentName;
     AutoCompleteTextView autoCourseName;
+    ArrayAdapter<String> adapter2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_main);
+        setTitle("Admin Dashboard");
 
         ArrayList<String> allStudents = new ArrayList<>();
         allStudents.addAll(Attendata.get(this).getAllStudents().values());
@@ -30,7 +33,7 @@ public class AdminMainActivity extends AppCompatActivity {
         ArrayList<String> allCourses = new ArrayList<>();
         allCourses.addAll(Attendata.get(this).getAllCourses().values());
 
-        ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(this,
+        adapter2 = new ArrayAdapter<String>(this,
                 android.R.layout.simple_dropdown_item_1line, allCourses);
 
         autoStudentName = (AutoCompleteTextView)
@@ -40,6 +43,15 @@ public class AdminMainActivity extends AppCompatActivity {
 
         autoCourseName.setAdapter(adapter2);
         autoStudentName.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onResume() {
+        ArrayList<String> allCourses = new ArrayList<>();
+        allCourses.addAll(Attendata.get(this).getAllCourses().values());
+        adapter2.notifyDataSetChanged();
+        autoCourseName.setAdapter(adapter2);
+        super.onResume();
     }
 
     @Override
@@ -79,9 +91,14 @@ public class AdminMainActivity extends AppCompatActivity {
         // error message saying they already have the lecture
         String studentName = autoStudentName.getText().toString();
         String courseName = autoCourseName.getText().toString();
+        if (studentName.isEmpty() || courseName.isEmpty()) {
+            Toast.makeText(this, "Choose a course and a student", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String selectedStudentId = Attendata.getKey(Attendata.get(this).getAllStudents(), studentName);
         String selectedCourseId = Attendata.getKey(Attendata.get(this).getAllCourses(), courseName);
         Attendata.get(this).addCourse(selectedCourseId, selectedStudentId);
+        Toast.makeText(this, studentName + " is successfully enrolled to " + courseName, Toast.LENGTH_SHORT).show();
     }
 
     public void removeLectureStudent(View v){
@@ -91,9 +108,13 @@ public class AdminMainActivity extends AppCompatActivity {
         //error message
         String studentName = autoStudentName.getText().toString();
         String courseName = autoCourseName.getText().toString();
+        if (studentName.isEmpty() || courseName.isEmpty()) {
+            Toast.makeText(this, "Choose a course and a student", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String selectedStudentId = Attendata.getKey(Attendata.get(this).getAllStudents(), studentName);
         String selectedCourseId = Attendata.getKey(Attendata.get(this).getAllCourses(), courseName);
         Attendata.get(this).dropCourse(selectedCourseId, selectedStudentId);
-
+        Toast.makeText(this, studentName + " dropped " + courseName, Toast.LENGTH_SHORT).show();
     }
 }

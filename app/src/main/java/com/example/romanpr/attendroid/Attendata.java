@@ -35,6 +35,7 @@ public class Attendata {
     private String userId;
     private FirebaseAuth mAuth;
     private boolean start;
+    private ValueEventListener mListener;
 
     public static Attendata get(Context context) {
         Log.d(TAG, "Inside Attendata");
@@ -49,7 +50,8 @@ public class Attendata {
         database = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
         start = true;
-        database.addValueEventListener(new ValueEventListener() {
+
+        mListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.d(TAG, "Data changed");
@@ -97,24 +99,24 @@ public class Attendata {
                 }
 
 
-                    if (start) {
-                        Intent intent = new Intent();
-                        //TeacherMainActivity.class
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        start = false;
-                        switch (Role.valueOf(user.getRole())) {
-                            case Student:
-                                intent.setClass(context, MainActivity.class);
-                                break;
-                            case Professor:
-                                intent.setClass(context, TeacherMainActivity.class);
-                                break;
-                            case Admin:
-                                intent.setClass(context, AdminMainActivity.class);
-                                break;
-                        }
-                        context.startActivity(intent);
+                if (start) {
+                    Intent intent = new Intent();
+                    //TeacherMainActivity.class
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    start = false;
+                    switch (Role.valueOf(user.getRole())) {
+                        case Student:
+                            intent.setClass(context, MainActivity.class);
+                            break;
+                        case Professor:
+                            intent.setClass(context, TeacherMainActivity.class);
+                            break;
+                        case Admin:
+                            intent.setClass(context, AdminMainActivity.class);
+                            break;
                     }
+                    context.startActivity(intent);
+                }
             }
 
             @Override
@@ -123,7 +125,8 @@ public class Attendata {
                 // Failed to read value
                 Log.w(TAG, "Failed to read value", databaseError.toException());
             }
-        });
+        };
+        database.addValueEventListener(mListener);
     }
 
     public DatabaseReference getDatabase() {
@@ -176,6 +179,7 @@ public class Attendata {
         String courseId = database.child("courses").push().getKey();
         Course course = new Course(courseName, professorId, totalHours, courseId);
         database.child("courses").child(courseId).setValue(course);
+        database.child("professors/" + course.getProfessor() + "/courses/" + courseId).setValue(true);
 
         for (ClassTime classTime : classTimes) {
             database.child("courses/" + courseId + "/schedule/")
@@ -213,6 +217,7 @@ public class Attendata {
     }
 
     public void signOut() {
+        database.removeEventListener(mListener);
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
             clearAttendata();
