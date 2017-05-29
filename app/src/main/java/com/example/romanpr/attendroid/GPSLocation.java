@@ -42,9 +42,6 @@ public class GPSLocation {
     public static boolean locationAccessPermissionGranted(Activity thisActivity) {
         return ActivityCompat.checkSelfPermission(thisActivity,
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(thisActivity,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED;
     }
 
@@ -52,9 +49,7 @@ public class GPSLocation {
         // Here, thisActivity is the current activity
         // Should we show an explanation?
         if (ActivityCompat.shouldShowRequestPermissionRationale(thisActivity,
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                && ActivityCompat.shouldShowRequestPermissionRationale(thisActivity,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                android.Manifest.permission.ACCESS_FINE_LOCATION)) {
 
             // Show an explanation to the user *asynchronously* -- don't block
             // this thread waiting for the user's response! After the user
@@ -72,7 +67,6 @@ public class GPSLocation {
     public static void requestCoarseFineLocation(Activity thisActivity) {
         ActivityCompat.requestPermissions(thisActivity,
                 new String[]{
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION,
                         android.Manifest.permission.ACCESS_FINE_LOCATION
                 },
                 LOCATION_ACCESS_PERMISSION_REQUEST);
@@ -86,8 +80,7 @@ public class GPSLocation {
         LocationManager locationManager = (LocationManager) thisActivity.getSystemService(Context.LOCATION_SERVICE);
         String provider = locationManager.getBestProvider(new Criteria(), false);
 
-        if (ActivityCompat.checkSelfPermission(thisActivity, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(thisActivity, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(thisActivity, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(thisActivity, "No Location Access Permission!", Toast.LENGTH_SHORT).show();
             GPSLocation.requestCoarseFineLocation(thisActivity);
             return null;

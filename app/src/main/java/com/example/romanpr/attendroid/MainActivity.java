@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     public void updateLocation() {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "Location access permission not granted", Toast.LENGTH_SHORT).show();
             GPSLocation.requestLocationPermissions(this);
             return;
