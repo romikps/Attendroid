@@ -212,18 +212,6 @@ public class Attendata {
         database.child("courses/" + courseId + "/students/").updateChildren(updates);
     }
 
-    public void submitAttendance(String courseId, String studentId) {
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("courses/" + courseId + "/students/" + studentId, true);
-        updates.put("students/" + studentId + "/attendanceData/" + courseId,
-                ((Student) user).getAttendanceData().get(courseId) + 1);
-        database.updateChildren(updates);
-    }
-
-    public void setLastAttendance(String userId, long mins) {
-        database.child("students/" + userId + "/lastAttendance").setValue(mins);
-    }
-
     public void signOut() {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {

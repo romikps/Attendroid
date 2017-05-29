@@ -29,46 +29,51 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "MainActivity";
-    private static final String KEY_LAST_ATTENDANCE_TIMESTAMP = "last_attendance_timestamp";
-    RecyclerView courseRecyclerView;
-    CourseAdapter adapter;
-    Attendata userData;
-    Student student;
-    GPSLocation profLocation;
-    Button attendanceBtn;
-    String openCourseId;
+    RecyclerView mCourseRecyclerView;
+    CourseAdapter mAdapter;
+    String mStudentId;
+    Student mStudent;
+    GPSLocation mProfessorLocation;
+    Button mAttendanceBtn;
+    String mOpenCourseId;
     DatabaseReference database;
-    ValueEventListener listener;
+    ValueEventListener mStudentListener;
+    ChildEventListener mCourseListener;
     TextView tvStudentName;
     TextView tvStudentNumber;
     TextView tvTotalPoints;
     GoogleApiClient mGoogleApiClient;
     Location mLastLocation;
-
+    Map<String, Course> mStudentCourses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        userData = Attendata.get(this);
-        student = (Student) userData.getUser();
-        database = FirebaseDatabase.getInstance().getReference("students/" + student.getUserId());
-        listener = new ValueEventListener() {
+        mStudentId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        database = FirebaseDatabase.getInstance().getReference();
+        mStudentListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                student = dataSnapshot.getValue(Student.class);
+                mStudent = dataSnapshot.getValue(Student.class);
                 updateStudent();
             }
 
@@ -77,12 +82,43 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
             }
         };
-        database.addValueEventListener(listener);
 
-        courseRecyclerView = (RecyclerView) findViewById(R.id.course_recycler_view);
-        courseRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        attendanceBtn = (Button) findViewById(R.id.attendance_button);
-        attendanceBtn.setEnabled(false);
+        mCourseListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (mStudent.getCourses().keySet().contains(dataSnapshot.getKey())) {
+                    mStudentCourses.put(dataSnapshot.getKey(), dataSnapshot.getValue(Course.class));
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                if (mStudent.getCourses().keySet().contains(dataSnapshot.getKey())) {
+                    mStudentCourses.remove(dataSnapshot.getKey());
+                    mStudentCourses.put(dataSnapshot.getKey(), dataSnapshot.getValue(Course.class));
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+        mCourseRecyclerView = (RecyclerView) findViewById(R.id.course_recycler_view);
+        mCourseRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mAttendanceBtn = (Button) findViewById(R.id.attendance_button);
+        mAttendanceBtn.setEnabled(false);
 
         tvStudentName = (TextView) findViewById(R.id.student_name);
         tvStudentNumber = (TextView) findViewById(R.id.student_number);
@@ -96,6 +132,24 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                     .addApi(LocationServices.API)
                     .build();
         }
+
+        mStudentCourses = new HashMap<>();
+    }
+
+    @Override
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        database.child("students/" + mStudentId).addValueEventListener(mStudentListener);
+        database.child("courses").addChildEventListener(mCourseListener);
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        database.child("students/" + mStudentId).removeEventListener(mStudentListener);
+        database.child("courses").removeEventListener(mCourseListener);
+        super.onStop();
     }
 
     public void updateLocation() {
@@ -129,18 +183,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     }
 
-    @Override
-    protected void onStart() {
-        mGoogleApiClient.connect();
-        super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        mGoogleApiClient.disconnect();
-        super.onStop();
-    }
-
     private class CourseHolder extends RecyclerView.ViewHolder {
         private TextView tvCourseName;
         private TextView tvAttendanceStatus;
@@ -154,30 +196,22 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         public void bindCourse(Course course) {
-            int hoursAttended = student.getAttendanceData().get(course.getCourseId());
+            int hoursAttended = mStudent.getAttendanceData().get(course.getCourseId());
             tvCourseName.setText(course.getCourseName());
             tvAttendanceStatus.setText(hoursAttended + "/" + course.getTotalHours());
             attendanceProgressBar.setMax(course.getTotalHours());
             attendanceProgressBar.setProgress(hoursAttended);
-            Log.d(TAG, course.toString());
             if (course.getIsTakingAttendance()) {
-                Log.d(TAG, course.getCourseName() + " is taking attendance!");
-                openCourseId = course.getCourseId();
-                Toast.makeText(MainActivity.this,
-                        "Submit attendance for " + course.getCourseName(), Toast.LENGTH_LONG).show();
+                mOpenCourseId = course.getCourseId();
                 attendanceProgressBar.setProgressTintList(ColorStateList.valueOf(Color.BLUE));
-                Log.d(TAG, "Current: " + getCurrentMin());
-                Log.d(TAG, "Last: " + student.getLastAttendance());
-                if (getCurrentMin() - student.getLastAttendance() >= 45) {
-                    attendanceBtn.setEnabled(true);
-                    attendanceBtn.setBackgroundResource(android.R.drawable.btn_default);
+                if (getTime() - mStudent.getLastAttendance() >= 45) {
+                    mAttendanceBtn.setEnabled(true);
                 }
-                Attendata.get(MainActivity.this).getDatabase()
-                        .child("professors/" + course.getProfessor() + "/location/")
+                database.child("professors/" + course.getProfessor() + "/location/")
                         .addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                profLocation = dataSnapshot.getValue(GPSLocation.class);
+                                mProfessorLocation = dataSnapshot.getValue(GPSLocation.class);
                             }
 
                             @Override
@@ -190,12 +224,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     public void updateStudent() {
-        tvStudentName.setText(student.getFirstName() + " " + student.getLastName());
-        tvStudentNumber.setText(Long.toString(student.getStudentId()));
-        String points = getString(R.string.points_format, student.getPoints());
+        tvStudentName.setText(mStudent.getFirstName() + " " + mStudent.getLastName());
+        tvStudentNumber.setText(Long.toString(mStudent.getStudentId()));
+        String points = getString(R.string.points_format, mStudent.getPoints());
         tvTotalPoints.setText(points);
-        adapter = new CourseAdapter(userData.getCourses());
-        courseRecyclerView.setAdapter(adapter);
+        List<Course> courses = new ArrayList<>();
+        courses.addAll(mStudentCourses.values());
+        mAdapter = new CourseAdapter(courses);
+        mCourseRecyclerView.setAdapter(mAdapter);
     }
 
     private class CourseAdapter extends RecyclerView.Adapter<CourseHolder> {
@@ -238,7 +274,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         Intent intent;
         switch (item.getItemId()) {
             case R.id.menu_item_show_schedule:
-                Log.d(TAG, "Show schedule from student");
                 intent = new Intent(this, ScheduleActivity.class);
                 startActivity(intent);
                 return true;
@@ -246,7 +281,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
                 return true;
             case R.id.menu_item_show_map_activity:
                 intent = new Intent(MainActivity.this, LocationActivity.class);
-                intent.putExtra("USER_ID", student.getUserId());
+                intent.putExtra("USER_ID", mStudentId);
                 startActivity(intent);
                 return true;
             case R.id.log_out_menu_item:
@@ -261,26 +296,34 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
     public void onGiveAttendanceClicked(View view) {
         updateLocation();
-        if (mLastLocation != null && profLocation != null) {
+        if (mLastLocation != null && mProfessorLocation != null) {
             GPSLocation studentLocation = new GPSLocation(mLastLocation.getLatitude(),
                     mLastLocation.getLongitude());
-            double distance = GPSLocation.getDistance(studentLocation, profLocation);
+            double distance = GPSLocation.getDistance(studentLocation, mProfessorLocation);
             Toast.makeText(this,
                     "Distance: " + distance,
                     Toast.LENGTH_SHORT).show();
-            if (distance >= 0 && distance < 10 && openCourseId != null) {
-                attendanceBtn.setBackgroundColor(Color.GREEN);
-                attendanceBtn.setEnabled(false);
-                userData.submitAttendance(openCourseId, student.getUserId());
-                userData.setLastAttendance(student.getUserId(), getCurrentMin());
+            if (distance >= 0 && distance < 10 && mOpenCourseId != null) {
+                mAttendanceBtn.setEnabled(false);
+                submitAttendance(mOpenCourseId);
             }
         } else {
-            Toast.makeText(this, "Some location is missing :(", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Professor's or student's location is missing", Toast.LENGTH_SHORT).show();
         }
 
     }
 
-    private long getCurrentMin() {
+    public void submitAttendance(String courseId) {
+        Map<String, Object> updates = new HashMap<>();
+        long time = getTime();
+        updates.put("courses/" + courseId + "/students/" + mStudentId, true);
+        updates.put("students/" + mStudentId + "/attendanceData/" + courseId,
+                mStudent.getAttendanceData().get(courseId) + 1);
+        updates.put("students/" + mStudentId + "/lastAttendance", time);
+        database.updateChildren(updates);
+    }
+
+    public long getTime() {
         return System.currentTimeMillis() / (1000 * 60);
     }
 }
