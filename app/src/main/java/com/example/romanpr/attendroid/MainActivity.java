@@ -1,11 +1,16 @@
 package com.example.romanpr.attendroid;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,6 +26,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,7 +37,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "MainActivity";
     private static final String KEY_LAST_ATTENDANCE_TIMESTAMP = "last_attendance_timestamp";
@@ -45,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
     TextView tvStudentName;
     TextView tvStudentNumber;
     TextView tvTotalPoints;
+    GoogleApiClient mGoogleApiClient;
+    Location mLastLocation;
 
 
     @Override
@@ -77,6 +87,58 @@ public class MainActivity extends AppCompatActivity {
         tvStudentName = (TextView) findViewById(R.id.student_name);
         tvStudentNumber = (TextView) findViewById(R.id.student_number);
         tvTotalPoints = (TextView) findViewById(R.id.total_points);
+
+        // Create an instance of GoogleAPIClient.
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+    }
+
+    public void updateLocation() {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Location access permission not granted", Toast.LENGTH_SHORT).show();
+            GPSLocation.requestLocationPermissions(this);
+            return;
+        }
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            Toast.makeText(this, "Your location: " + mLastLocation.getLatitude()
+                    + " " + mLastLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "The location is null", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        updateLocation();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
     }
 
     private class CourseHolder extends RecyclerView.ViewHolder {
@@ -150,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
             return new CourseHolder(view);
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         public void onBindViewHolder(CourseHolder holder, int position) {
             Course course = courses.get(position);
@@ -197,8 +260,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onGiveAttendanceClicked(View view) {
-        GPSLocation studentLocation = GPSLocation.getLocation(this);
-        if (studentLocation != null && profLocation != null) {
+        updateLocation();
+        if (mLastLocation != null && profLocation != null) {
+            GPSLocation studentLocation = new GPSLocation(mLastLocation.getLatitude(),
+                    mLastLocation.getLongitude());
             double distance = GPSLocation.getDistance(studentLocation, profLocation);
             Toast.makeText(this,
                     "Distance: " + distance,

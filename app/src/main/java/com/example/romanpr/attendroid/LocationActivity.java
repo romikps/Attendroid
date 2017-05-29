@@ -82,14 +82,15 @@ public class LocationActivity extends AppCompatActivity
 
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(10 * 60 * 1000);
-        mLocationRequest.setFastestInterval(5 * 60 * 1000);
+        mLocationRequest.setInterval(60 * 1000);
+        mLocationRequest.setFastestInterval(30 * 1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     protected void startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "Location updates access permission not granted", Toast.LENGTH_SHORT).show();
+            GPSLocation.requestLocationPermissions(this);
             return;
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(
@@ -208,7 +209,7 @@ public class LocationActivity extends AppCompatActivity
 
     @Override
     protected void onStop() {
-        // mGoogleApiClient.disconnect();
+        mGoogleApiClient.disconnect();
         super.onStop();
         if (locationListener != null) {
             database.removeEventListener(locationListener);
