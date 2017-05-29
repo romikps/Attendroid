@@ -3,12 +3,10 @@ package com.example.romanpr.attendroid;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -24,6 +22,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,9 +36,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocationActivity extends AppCompatActivity {
+public class LocationActivity extends AppCompatActivity
+        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        com.google.android.gms.location.LocationListener {
 
-    private static final int LOCATION_ACCESS_PERMISSION_REQUEST = 1;
     EditText currentActivity;
     Button provideLocation;
     ListView userLocations;
@@ -44,14 +48,19 @@ public class LocationActivity extends AppCompatActivity {
     List<LocationInfo> locations;
     LocationListAdapter adapter;
     ChildEventListener locationListener;
-    LocationManager mLocationManager;
-    LocationListener mLocationListener;
+
+    GoogleApiClient mGoogleApiClient;
+    Location mLastLocation;
+    LocationRequest mLocationRequest;
+    private FirebaseAuth mAuth;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
-        userId = getIntent().getStringExtra("USER_ID");
+        mAuth = FirebaseAuth.getInstance();
+        userId = mAuth.getCurrentUser().getUid();
         locations = new ArrayList<>();
         database = FirebaseDatabase.getInstance().getReference("locations/" + userId);
         currentActivity = (EditText) findViewById(R.id.current_activity_edit_text);
@@ -60,104 +69,49 @@ public class LocationActivity extends AppCompatActivity {
         adapter = new LocationListAdapter(this, locations);
         userLocations.setAdapter(adapter);
 
-        /*database.child("locations/" + userId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                locations.clear();
-                for (DataSnapshot loc : dataSnapshot.getChildren()) {
-                    locations.add(loc.getValue(LocationInfo.class));
-                }
-                Collections.sort(locations, new Comparator<LocationInfo>() {
-                    @Override
-                    public int compare(LocationInfo loc2, LocationInfo loc1)
-                    {
-                        return  loc1.getTimestamp().compareTo(loc2.getTimestamp());
-                    }
-                });
-                adapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });*/
-
-        mLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        String provider = mLocationManager.getBestProvider(new Criteria(), false);
-        mLocationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                LocationInfo locationInfo = new LocationInfo(
-                        new GPSLocation(location.getLatitude(), location.getLongitude()),
-                        "Automatically acquired location");
-                storeUserLocationInfo(locationInfo);
-            }
-
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-
-            }
-        };
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            GPSLocation.requestCoarseFineLocation(this);
-            return;
+        // Create an instance of GoogleAPIClient.
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
         }
-        mLocationManager.requestLocationUpdates(provider, 5 * 60 * 1000, 0, mLocationListener);
+        createLocationRequest();
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case LOCATION_ACCESS_PERMISSION_REQUEST: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 1
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // location-related task you need to do.
-                    Toast.makeText(this, "Location permissions successfully granted", Toast.LENGTH_SHORT).show();
-                } else {
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10 * 60 * 1000);
+        mLocationRequest.setFastestInterval(5 * 60 * 1000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
 
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return;
-            }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
+    protected void startLocationUpdates() {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Location updates access permission not granted", Toast.LENGTH_SHORT).show();
+            return;
         }
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, mLocationRequest, this);
     }
 
     public void onGiveMyLocationClicked(View view) {
-        GPSLocation gpsLocation = GPSLocation.getLocation(this);
-        if (gpsLocation != null) {
-            long currentTimme = getTimestamp();
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Location access permission not granted", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            GPSLocation gpsLocation = new GPSLocation(mLastLocation.getLatitude(),
+                    mLastLocation.getLongitude());
             LocationInfo locationInfo = new LocationInfo(gpsLocation,
                     currentActivity.getText().toString());
             currentActivity.setText("");
             storeUserLocationInfo(locationInfo);
         } else {
-            Toast.makeText(this, "Can't access your location!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "The location is null", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -165,8 +119,29 @@ public class LocationActivity extends AppCompatActivity {
         database.push().setValue(location);
     }
 
-    public long getTimestamp() {
-        return System.currentTimeMillis();
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        startLocationUpdates();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mLastLocation = location;
+        GPSLocation gpsLocation = new GPSLocation(mLastLocation.getLatitude(),
+                mLastLocation.getLongitude());
+        LocationInfo locationInfo = new LocationInfo(gpsLocation,
+                "Automatic location");
+        storeUserLocationInfo(locationInfo);
     }
 
     private class LocationListAdapter extends ArrayAdapter<LocationInfo> {
@@ -198,6 +173,7 @@ public class LocationActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
+        mGoogleApiClient.connect();
         super.onStart();
         locations.clear();
         locationListener = new ChildEventListener() {
@@ -232,10 +208,17 @@ public class LocationActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
+        // mGoogleApiClient.disconnect();
         super.onStop();
         if (locationListener != null) {
             database.removeEventListener(locationListener);
         }
+        // stopLocationUpdates();
+    }
+
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
     }
 
     @Override
