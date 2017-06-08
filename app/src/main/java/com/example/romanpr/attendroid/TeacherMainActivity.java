@@ -1,8 +1,13 @@
 package com.example.romanpr.attendroid;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -18,11 +23,16 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class TeacherMainActivity extends AppCompatActivity {
+public class TeacherMainActivity extends AppCompatActivity  implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     private static final String TAG = "TeacherMainActivity";
     TextView time_remain;
@@ -35,6 +45,9 @@ public class TeacherMainActivity extends AppCompatActivity {
     List<String> professorCourses;
     String selectedCourseId;
     Attendata profData;
+
+    GoogleApiClient mGoogleApiClient;
+    Location mLastLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,11 +109,7 @@ public class TeacherMainActivity extends AppCompatActivity {
             }
 
             public void onFinish() {
-                time_remain.setText("Time is up!");
-                take_attend_switch.setEnabled(false);
-                profData.storeProfessorLocation(new GPSLocation(0, 0));
-                profData.setTakingAttendance(selectedCourseId, false);
-                spinner.setEnabled(true);
+                turnoffAttendance();
             }
         };
 
@@ -110,27 +119,80 @@ public class TeacherMainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
                 if(!isChecked){
-                    time_remain.setVisibility(View.INVISIBLE);
-                    time_text.setVisibility(View.INVISIBLE);
-                    // Clear professor's location
-                    profData.storeProfessorLocation(new GPSLocation(0, 0));
-                    profData.setTakingAttendance(selectedCourseId, false);
+                    turnoffAttendance();
                 }
                 else {
                     time_remain.setVisibility(View.VISIBLE);
                     time_text.setVisibility(View.VISIBLE);
                     Log.d(TAG, "Trying to access location");
-                    GPSLocation profLocation = GPSLocation.getLocation(TeacherMainActivity.this);
-                    if (profLocation != null) {
+                    updateLocation();
+                    if (mLastLocation != null) {
+                        GPSLocation profLocation = new GPSLocation(mLastLocation.getLatitude(),
+                                mLastLocation.getLongitude());
                         profData.storeProfessorLocation(profLocation);
                         profData.setTakingAttendance(selectedCourseId, true);
                         profData.clearClassAttendance(selectedCourseId);
                         spinner.setEnabled(false);
                         count.start();
+                    } else {
+                        Toast.makeText(TeacherMainActivity.this, "Can't access your location", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
         });
+
+        // Create an instance of GoogleAPIClient.
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        turnoffAttendance();
+    }
+
+    public void updateLocation() {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Location access permission not granted", Toast.LENGTH_SHORT).show();
+            GPSLocation.requestLocationPermissions(this);
+            return;
+        }
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+        if (mLastLocation != null) {
+            Toast.makeText(this, "Your location: " + mLastLocation.getLatitude()
+                    + " " + mLastLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "The location is null", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void turnoffAttendance() {
+
+        time_remain.setVisibility(View.INVISIBLE);
+        time_text.setVisibility(View.INVISIBLE);
+        // Clear professor's location
+        profData.storeProfessorLocation(new GPSLocation(0, 0));
+        profData.setTakingAttendance(selectedCourseId, false);
+        spinner.setEnabled(true);
     }
 
     public void showStudentList(View v){
@@ -174,5 +236,20 @@ public class TeacherMainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        updateLocation();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
 }

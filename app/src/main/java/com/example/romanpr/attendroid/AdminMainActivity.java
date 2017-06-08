@@ -11,12 +11,25 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class AdminMainActivity extends AppCompatActivity {
     AutoCompleteTextView autoStudentName;
     AutoCompleteTextView autoCourseName;
-    ArrayAdapter<String> adapter2;
+    List<Student> mAllStudents;
+    List<Course> mAllCourses;
+    List<String> mStudentNames;
+    List<String> mCourseNames;
+    ArrayAdapter<String> studentAdapter;
+    ArrayAdapter<String> courseAdapter;
+    DatabaseReference database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,34 +37,83 @@ public class AdminMainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_admin_main);
         setTitle("Admin Dashboard");
 
-        ArrayList<String> allStudents = new ArrayList<>();
-        allStudents.addAll(Attendata.get(this).getAllStudents().values());
+        database = FirebaseDatabase.getInstance().getReference();
+        mAllStudents = new ArrayList<>();
+        mAllCourses = new ArrayList<>();
+        mStudentNames = new ArrayList<>();
+        mCourseNames = new ArrayList<>();
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_dropdown_item_1line, allStudents);
-
-        ArrayList<String> allCourses = new ArrayList<>();
-        allCourses.addAll(Attendata.get(this).getAllCourses().values());
-
-        adapter2 = new ArrayAdapter<String>(this,
-                android.R.layout.simple_dropdown_item_1line, allCourses);
+        studentAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, mStudentNames);
+        courseAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_dropdown_item_1line, mCourseNames);
 
         autoStudentName = (AutoCompleteTextView)
                 findViewById(R.id.tvStudentName);
         autoCourseName = (AutoCompleteTextView)
                 findViewById(R.id.tvCourseName);
 
-        autoCourseName.setAdapter(adapter2);
-        autoStudentName.setAdapter(adapter);
+        autoCourseName.setAdapter(courseAdapter);
+        autoStudentName.setAdapter(studentAdapter);
     }
+
+    String getStudentId(String studentName) {
+        for (Student student : mAllStudents) {
+            String currentStudentName = student.getFirstName() + " " + student.getLastName() + " ("
+                    + student.getStudentId() + ")";
+            if (currentStudentName.equals(studentName))
+                return student.getUserId();
+        }
+        return null;
+    }
+
+    String getCourseId(String courseName) {
+        for (Course course : mAllCourses) {
+            if (course.getCourseName().equals(courseName)) {
+                return course.getCourseId();
+            }
+        }
+        return null;
+    }
+
+
 
     @Override
     protected void onResume() {
-        ArrayList<String> allCourses = new ArrayList<>();
-        allCourses.addAll(Attendata.get(this).getAllCourses().values());
-        adapter2.notifyDataSetChanged();
-        autoCourseName.setAdapter(adapter2);
         super.onResume();
+        mAllStudents.clear();
+        mAllCourses.clear();
+        mStudentNames.clear();
+        mCourseNames.clear();
+        database.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                DataSnapshot dsStudents = dataSnapshot.child("students");
+                DataSnapshot dsCourses = dataSnapshot.child("courses");
+                // Retrieving students
+                Student student;
+                for (DataSnapshot dsStudent : dsStudents.getChildren()) {
+                    student = dsStudent.getValue(Student.class);
+                    mAllStudents.add(student);
+                    mStudentNames.add(student.getFirstName() + " " + student.getLastName() + " ("
+                    + student.getStudentId() + ")");
+                }
+                // Retrieving courses
+                Course course;
+                for (DataSnapshot dsCourse : dsCourses.getChildren()) {
+                    course = dsCourse.getValue(Course.class);
+                    mAllCourses.add(course);
+                    mCourseNames.add(course.getCourseName());
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        studentAdapter.notifyDataSetChanged();
+        courseAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -91,12 +153,12 @@ public class AdminMainActivity extends AppCompatActivity {
         // error message saying they already have the lecture
         String studentName = autoStudentName.getText().toString();
         String courseName = autoCourseName.getText().toString();
-        if (studentName.isEmpty() || courseName.isEmpty()) {
-            Toast.makeText(this, "Choose a course and a student", Toast.LENGTH_SHORT).show();
+        String selectedStudentId = getStudentId(studentName);
+        String selectedCourseId = getCourseId(courseName);
+        if (selectedStudentId.isEmpty() || selectedCourseId.isEmpty()) {
+            Toast.makeText(this, "Selected course or student doesn't exist", Toast.LENGTH_SHORT).show();
             return;
         }
-        String selectedStudentId = Attendata.getKey(Attendata.get(this).getAllStudents(), studentName);
-        String selectedCourseId = Attendata.getKey(Attendata.get(this).getAllCourses(), courseName);
         Attendata.get(this).addCourse(selectedCourseId, selectedStudentId);
         Toast.makeText(this, studentName + " is successfully enrolled to " + courseName, Toast.LENGTH_SHORT).show();
     }
@@ -108,12 +170,12 @@ public class AdminMainActivity extends AppCompatActivity {
         //error message
         String studentName = autoStudentName.getText().toString();
         String courseName = autoCourseName.getText().toString();
-        if (studentName.isEmpty() || courseName.isEmpty()) {
-            Toast.makeText(this, "Choose a course and a student", Toast.LENGTH_SHORT).show();
+        String selectedStudentId = getStudentId(studentName);
+        String selectedCourseId = getCourseId(courseName);
+        if (selectedStudentId.isEmpty() || selectedCourseId.isEmpty()) {
+            Toast.makeText(this, "Selected course or student doesn't exist", Toast.LENGTH_SHORT).show();
             return;
         }
-        String selectedStudentId = Attendata.getKey(Attendata.get(this).getAllStudents(), studentName);
-        String selectedCourseId = Attendata.getKey(Attendata.get(this).getAllCourses(), courseName);
         Attendata.get(this).dropCourse(selectedCourseId, selectedStudentId);
         Toast.makeText(this, studentName + " dropped " + courseName, Toast.LENGTH_SHORT).show();
     }

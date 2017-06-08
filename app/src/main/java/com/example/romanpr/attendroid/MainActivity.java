@@ -91,6 +91,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         mCourseListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (mStudent.getCourses() == null) {
+                    return;
+                }
                 if (mStudent.getCourses().keySet().contains(dataSnapshot.getKey())) {
                     mStudentCourses.add(dataSnapshot.getValue(Course.class));
                     mAdapter.notifyItemInserted(mStudentCourses.size() - 1);
@@ -99,6 +102,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                if (mStudent.getCourses() == null) {
+                    return;
+                }
                 if (mStudent.getCourses().keySet().contains(dataSnapshot.getKey())) {
                     for (int i = 0; i < mStudentCourses.size(); i++) {
                         if (mStudentCourses.get(i).getCourseId().equals(dataSnapshot.getKey())) {
@@ -253,8 +259,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         tvStudentName.setText(mStudent.getFirstName() + " " + mStudent.getLastName());
         tvStudentNumber.setText(Long.toString(mStudent.getStudentId()));
         int points = 0;
-        for (int hoursAttended : mStudent.getAttendanceData().values()) {
-            points += hoursAttended * 3;
+        if (mStudent.getAttendanceData() != null) {
+            for (int hoursAttended : mStudent.getAttendanceData().values()) {
+                points += hoursAttended * 3;
+            }
         }
         tvTotalPoints.setText(getString(R.string.points_format, points));
     }
@@ -324,13 +332,21 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.C
         if (mLastLocation != null && mProfessorLocation != null) {
             GPSLocation studentLocation = new GPSLocation(mLastLocation.getLatitude(),
                     mLastLocation.getLongitude());
-            double distance = GPSLocation.getDistance(studentLocation, mProfessorLocation);
+            /*double distance = GPSLocation.getDistance(studentLocation, mProfessorLocation);
             Toast.makeText(this,
                     "Distance: " + distance,
                     Toast.LENGTH_SHORT).show();
-            if (distance >= 0 && distance < 10 && mOpenCourseId != null) {
+            if (distance >= 0 && distance < 10 && mOpenCourseId != null) {*/
+            Log.w(TAG, "Difference lat: "
+                    + (studentLocation.getLatitude() - mProfessorLocation.getLatitude()));
+            Log.w(TAG, "Difference long: "
+                    + (studentLocation.getLongitude() - mProfessorLocation.getLongitude()));
+            if (studentLocation.getLatitude() - mProfessorLocation.getLatitude() <= 0.002
+                    && studentLocation.getLongitude() - mProfessorLocation.getLongitude() <= 0.002) {
                 mAttendanceBtn.setEnabled(false);
                 submitAttendance(mOpenCourseId);
+            } else {
+                Toast.makeText(this, "The distance is too long", Toast.LENGTH_SHORT).show();
             }
         } else {
             Toast.makeText(this, "Professor's or student's location is missing", Toast.LENGTH_SHORT).show();

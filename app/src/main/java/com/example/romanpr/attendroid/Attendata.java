@@ -59,6 +59,8 @@ public class Attendata {
                 allCourses = new HashMap<>();
                 allStudents = new HashMap<>();
                 allProfessors = new HashMap<>();
+                if (mAuth.getCurrentUser() == null)
+                    return;
                 userId = mAuth.getCurrentUser().getUid();
 
                 DataSnapshot dsStudents = dataSnapshot.child("students");

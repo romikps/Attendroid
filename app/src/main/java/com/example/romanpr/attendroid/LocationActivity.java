@@ -143,11 +143,11 @@ public class LocationActivity extends AppCompatActivity
     @Override
     public void onLocationChanged(Location location) {
         mLastLocation = location;
-        GPSLocation gpsLocation = new GPSLocation(mLastLocation.getLatitude(),
+        /*GPSLocation gpsLocation = new GPSLocation(mLastLocation.getLatitude(),
                 mLastLocation.getLongitude());
         LocationInfo locationInfo = new LocationInfo(gpsLocation,
                 "Automatic location");
-        storeUserLocationInfo(locationInfo);
+        storeUserLocationInfo(locationInfo);*/
     }
 
     private class LocationListAdapter extends ArrayAdapter<LocationInfo> {
