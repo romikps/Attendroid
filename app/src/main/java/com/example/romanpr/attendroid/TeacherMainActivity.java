@@ -161,11 +161,6 @@ public class TeacherMainActivity extends AppCompatActivity  implements GoogleApi
     protected void onStop() {
         super.onStop();
         mGoogleApiClient.disconnect();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
         turnoffAttendance();
     }
 
@@ -189,6 +184,7 @@ public class TeacherMainActivity extends AppCompatActivity  implements GoogleApi
 
         time_remain.setVisibility(View.INVISIBLE);
         time_text.setVisibility(View.INVISIBLE);
+        take_attend_switch.setChecked(false);
         // Clear professor's location
         profData.storeProfessorLocation(new GPSLocation(0, 0));
         profData.setTakingAttendance(selectedCourseId, false);
