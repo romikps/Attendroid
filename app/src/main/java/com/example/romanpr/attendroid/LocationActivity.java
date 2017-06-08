@@ -83,8 +83,8 @@ public class LocationActivity extends AppCompatActivity
 
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(60 * 1000);
-        mLocationRequest.setFastestInterval(30 * 1000);
+        mLocationRequest.setInterval(60 * 60 * 1000);
+        mLocationRequest.setFastestInterval(30 * 60 * 1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -99,6 +99,10 @@ public class LocationActivity extends AppCompatActivity
     }
 
     public void onGiveMyLocationClicked(View view) {
+        if (currentActivity.getText().toString().isEmpty()) {
+            Toast.makeText(this, "Let us know what you're doing...", Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "Location access permission not granted", Toast.LENGTH_SHORT).show();
             return;

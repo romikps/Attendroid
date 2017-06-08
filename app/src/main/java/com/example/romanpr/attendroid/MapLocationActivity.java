@@ -30,7 +30,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -126,12 +128,14 @@ public class MapLocationActivity extends AppCompatActivity implements OnMapReady
         database.child("locations/" + userId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                LocationInfo locInfo;
-                LatLng placeLocation;
                 LatLngBounds.Builder bld = new LatLngBounds.Builder();
+                ArrayList<LocationInfo> locList = new ArrayList<>();
                 for (DataSnapshot loc : dataSnapshot.getChildren()) {
-                    locInfo = loc.getValue(LocationInfo.class);
-                    placeLocation = new LatLng(locInfo.getLocation().getLatitude(),
+                    locList.add(loc.getValue(LocationInfo.class));
+                }
+                for (int i = locList.size()-1; i >= 0; i--) {
+                    LocationInfo locInfo = locList.get(i);
+                    LatLng placeLocation = new LatLng(locInfo.getLocation().getLatitude(),
                             locInfo.getLocation().getLongitude());
                     bld.include(placeLocation);
                     Marker placeMarker = mMap.addMarker(new MarkerOptions().position(placeLocation)
@@ -168,21 +172,23 @@ public class MapLocationActivity extends AppCompatActivity implements OnMapReady
                 database.child("locations").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        LocationInfo locInfo;
-                        LatLng placeLocation;
                         LatLngBounds.Builder bld = new LatLngBounds.Builder();
                         for (DataSnapshot user : dataSnapshot.getChildren()) {
+                            ArrayList<LocationInfo> locList = new ArrayList<>();
                             for (DataSnapshot loc : user.getChildren()) {
-                                locInfo = loc.getValue(LocationInfo.class);
-                                placeLocation = new LatLng(locInfo.getLocation().getLatitude(),
+                                locList.add(loc.getValue(LocationInfo.class));
+                            }
+                            for (int i = locList.size() - 1; i >= 0; i--) {
+                                LocationInfo locInfo = locList.get(i);
+                                LatLng placeLocation = new LatLng(locInfo.getLocation().getLatitude(),
                                         locInfo.getLocation().getLongitude());
                                 bld.include(placeLocation);
                                 Marker placeMarker = mMap.addMarker(
                                         new MarkerOptions()
                                                 .position(placeLocation)
                                                 .title(locInfo.getActivity())
-                                        .snippet(mUsers.get(user.getKey()) + "\n" + locInfo.getTimestamp().toString())
-                                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
+                                                .snippet(mUsers.get(user.getKey()) + "\n" + locInfo.getTimestamp().toString())
+                                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
                                 );
                                 // finalGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(placeLocation));
                                 // finalGoogleMap.animateCamera(CameraUpdateFactory.zoomTo(10), 1000, null);
